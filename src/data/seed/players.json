@@ -1,0 +1,41 @@
+[
+  { "id": "pl-rma-1", "teamId": "team-rma", "name": "Thibaut Courtois", "position": "Gardien" },
+  { "id": "pl-rma-2", "teamId": "team-rma", "name": "Dani Carvajal", "position": "Défenseur" },
+  { "id": "pl-rma-3", "teamId": "team-rma", "name": "Antonio Rüdiger", "position": "Défenseur" },
+  { "id": "pl-rma-4", "teamId": "team-rma", "name": "Ferland Mendy", "position": "Défenseur" },
+  { "id": "pl-rma-5", "teamId": "team-rma", "name": "Federico Valverde", "position": "Milieu" },
+  { "id": "pl-rma-6", "teamId": "team-rma", "name": "Jude Bellingham", "position": "Milieu" },
+  { "id": "pl-rma-7", "teamId": "team-rma", "name": "Luka Modrić", "position": "Milieu" },
+  { "id": "pl-rma-8", "teamId": "team-rma", "name": "Vinícius Júnior", "position": "Attaquant" },
+  { "id": "pl-rma-9", "teamId": "team-rma", "name": "Kylian Mbappé", "position": "Attaquant" },
+
+  { "id": "pl-fcb-1", "teamId": "team-fcb", "name": "Marc-André ter Stegen", "position": "Gardien" },
+  { "id": "pl-fcb-2", "teamId": "team-fcb", "name": "Jules Koundé", "position": "Défenseur" },
+  { "id": "pl-fcb-3", "teamId": "team-fcb", "name": "Ronald Araújo", "position": "Défenseur" },
+  { "id": "pl-fcb-4", "teamId": "team-fcb", "name": "Pedri", "position": "Milieu" },
+  { "id": "pl-fcb-5", "teamId": "team-fcb", "name": "Gavi", "position": "Milieu" },
+  { "id": "pl-fcb-6", "teamId": "team-fcb", "name": "Robert Lewandowski", "position": "Attaquant" },
+
+  { "id": "pl-int-1", "teamId": "team-int", "name": "Yann Sommer", "position": "Gardien" },
+  { "id": "pl-int-2", "teamId": "team-int", "name": "Alessandro Bastoni", "position": "Défenseur" },
+  { "id": "pl-int-3", "teamId": "team-int", "name": "Nicolò Barella", "position": "Milieu" },
+  { "id": "pl-int-4", "teamId": "team-int", "name": "Lautaro Martínez", "position": "Attaquant" },
+
+  { "id": "pl-mil-1", "teamId": "team-mil", "name": "Mike Maignan", "position": "Gardien" },
+  { "id": "pl-mil-2", "teamId": "team-mil", "name": "Rafael Leão", "position": "Attaquant" },
+
+  { "id": "pl-bay-1", "teamId": "team-bay", "name": "Manuel Neuer", "position": "Gardien" },
+
+  { "id": "pl-psg-1", "teamId": "team-psg", "name": "Gianluigi Donnarumma", "position": "Gardien" },
+  { "id": "pl-psg-2", "teamId": "team-psg", "name": "Achraf Hakimi", "position": "Défenseur" },
+  { "id": "pl-psg-3", "teamId": "team-psg", "name": "Vitinha", "position": "Milieu" },
+  { "id": "pl-psg-4", "teamId": "team-psg", "name": "Ousmane Dembélé", "position": "Attaquant" },
+
+  { "id": "pl-city-1", "teamId": "team-city", "name": "Ederson", "position": "Gardien" },
+  { "id": "pl-city-2", "teamId": "team-city", "name": "Rúben Dias", "position": "Défenseur" },
+  { "id": "pl-city-3", "teamId": "team-city", "name": "Erling Haaland", "position": "Attaquant" },
+
+  { "id": "pl-est-1", "teamId": "team-est", "name": "Béchir Ben Saïd", "position": "Gardien" },
+  { "id": "pl-est-2", "teamId": "team-est", "name": "Yassine Meriah", "position": "Défenseur" },
+  { "id": "pl-est-3", "teamId": "team-est", "name": "Youcef Belaïli", "position": "Attaquant" }
+]

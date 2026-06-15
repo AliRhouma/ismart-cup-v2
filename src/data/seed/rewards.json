@@ -1,0 +1,18 @@
+[
+  {
+    "id": "rw-avril-1", "tournamentId": "t-avril", "kind": "trophy",
+    "title": "Trophée du Champion", "description": "Remis à l'équipe vainqueure du tournoi."
+  },
+  {
+    "id": "rw-avril-2", "tournamentId": "t-avril", "kind": "medal",
+    "title": "Médailles d'Équipe", "description": "Pour les deux équipes finalistes."
+  },
+  {
+    "id": "rw-avril-3", "tournamentId": "t-avril", "kind": "individual",
+    "title": "Meilleur Buteur", "description": "Récompense individuelle du meilleur réalisateur."
+  },
+  {
+    "id": "rw-avril-4", "tournamentId": "t-avril", "kind": "individual",
+    "title": "Meilleur Gardien", "description": "Récompense individuelle du gardien le plus performant."
+  }
+]

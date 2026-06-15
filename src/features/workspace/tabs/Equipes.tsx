@@ -10,6 +10,8 @@ import EmptyState from "@/components/kit/EmptyState"
 import FormSheet from "@/components/kit/FormSheet"
 import ConfirmDialog from "@/components/kit/ConfirmDialog"
 import { useTeams, type TeamInput } from "@/stores/useTeams"
+import { usePlayers } from "@/stores/usePlayers"
+import TeamRosterSheet from "@/features/workspace/TeamRosterSheet"
 import type { Team } from "@/data/types"
 import { cn, fakeDelay } from "@/lib/utils"
 
@@ -36,9 +38,17 @@ export default function Equipes() {
   const addTeam = useTeams((s) => s.addTeam)
   const updateTeam = useTeams((s) => s.updateTeam)
   const removeTeam = useTeams((s) => s.removeTeam)
+  const players = usePlayers((s) => s.players)
 
   // Derive this tournament's teams in the component (keep the store CRUD-only).
   const rows = useMemo(() => teams.filter((t) => t.tournamentId === id), [teams, id])
+
+  // Player count per team (derived) — feeds the Effectif column + summary strip.
+  const playerCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const p of players) counts[p.teamId] = (counts[p.teamId] ?? 0) + 1
+    return counts
+  }, [players])
 
   // Simulate a fetch so the loading state is exercised (prototype "looks real").
   const [loading, setLoading] = useState(true)
@@ -58,6 +68,15 @@ export default function Equipes() {
 
   // Delete
   const [deleting, setDeleting] = useState<Team | null>(null)
+
+  // View roster — keep `viewing` set across close so the slide-out animation plays.
+  const [viewing, setViewing] = useState<Team | null>(null)
+  const [rosterOpen, setRosterOpen] = useState(false)
+
+  function openRoster(team: Team) {
+    setViewing(team)
+    setRosterOpen(true)
+  }
 
   function openCreate() {
     setEditing(null)
@@ -114,6 +133,7 @@ export default function Equipes() {
   }
 
   const favoritesCount = rows.filter((t) => t.favorite).length
+  const totalPlayers = rows.reduce((sum, t) => sum + (playerCounts[t.id] ?? 0), 0)
 
   const columns: Column<Team>[] = [
     {
@@ -149,6 +169,25 @@ export default function Equipes() {
       key: "category",
       header: "Catégorie",
       cell: (t) => <Badge variant="brand">{t.category}</Badge>,
+    },
+    {
+      key: "players",
+      header: "Effectif",
+      cell: (t) => {
+        const count = playerCounts[t.id] ?? 0
+        return (
+          <button
+            type="button"
+            onClick={() => openRoster(t)}
+            aria-label={`Voir l'effectif de ${t.name}`}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-sm text-ink-subtle transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+          >
+            <Users className="size-4" />
+            <span className="font-semibold">{count}</span>
+            <span>joueur{count > 1 ? "s" : ""}</span>
+          </button>
+        )
+      },
     },
     {
       key: "actions",
@@ -202,6 +241,11 @@ export default function Equipes() {
           <span className="inline-flex items-center gap-1.5">
             <Star className="size-3.5 fill-current text-accent2-500" />
             Favoris <span className="font-semibold text-ink">{favoritesCount}</span>
+          </span>
+          <span className="text-ink-muted">·</span>
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="size-3.5 text-ink-muted" />
+            Joueurs <span className="font-semibold text-ink">{totalPlayers}</span>
           </span>
         </div>
       )}
@@ -311,6 +355,10 @@ export default function Equipes() {
         confirmLabel="Supprimer"
         onConfirm={handleDelete}
       />
+
+      {viewing && (
+        <TeamRosterSheet team={viewing} open={rosterOpen} onOpenChange={setRosterOpen} />
+      )}
     </div>
   )
 }

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "m-avril-a1", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule A",
+    "roundNumber": 1, "team1Id": "team-rma", "team2Id": "team-int", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "10:00", "stadiumId": "stade-a", "score1": 2, "score2": 1
+  },
+  {
+    "id": "m-avril-a2", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule A",
+    "roundNumber": 1, "team1Id": "team-rma", "team2Id": "team-fcb", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "12:00", "stadiumId": "stade-a", "score1": 3, "score2": 1
+  },
+  {
+    "id": "m-avril-a3", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule A",
+    "roundNumber": 2, "team1Id": "team-rma", "team2Id": "team-psg", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "14:00", "stadiumId": "stade-a", "score1": 2, "score2": 0
+  },
+  {
+    "id": "m-avril-a4", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule A",
+    "roundNumber": 2, "team1Id": "team-int", "team2Id": "team-fcb", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "10:00", "stadiumId": "stade-b", "score1": 1, "score2": 1
+  },
+  {
+    "id": "m-avril-a5", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule A",
+    "roundNumber": 3, "team1Id": "team-int", "team2Id": "team-psg", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "12:00", "stadiumId": "stade-b", "score1": 0, "score2": 2
+  },
+  {
+    "id": "m-avril-a6", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule A",
+    "roundNumber": 3, "team1Id": "team-fcb", "team2Id": "team-psg", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "14:00", "stadiumId": "stade-b", "score1": 2, "score2": 2
+  },
+
+  {
+    "id": "m-avril-b1", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule B",
+    "roundNumber": 1, "team1Id": "team-mil", "team2Id": "team-bay", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "10:00", "stadiumId": "stade-c", "score1": 0, "score2": 0
+  },
+  {
+    "id": "m-avril-b2", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule B",
+    "roundNumber": 1, "team1Id": "team-ess", "team2Id": "team-mil", "status": "FORFEIT",
+    "date": "2026-04-01", "startTime": "12:00", "stadiumId": "stade-c", "score1": 0, "score2": 3
+  },
+  {
+    "id": "m-avril-b3", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule B",
+    "roundNumber": 2, "team1Id": "team-bay", "team2Id": "team-city", "status": "COMPLETED",
+    "date": "2026-04-01", "startTime": "14:00", "stadiumId": "stade-c", "score1": 1, "score2": 2
+  },
+  {
+    "id": "m-avril-b4", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule B",
+    "roundNumber": 2, "team1Id": "team-ess", "team2Id": "team-bay", "status": "SCHEDULED",
+    "date": "2026-04-01", "startTime": "16:00", "stadiumId": "stade-d"
+  },
+  {
+    "id": "m-avril-b5", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule B",
+    "roundNumber": 3, "team1Id": "team-mil", "team2Id": "team-city", "status": "SCHEDULED",
+    "date": "2026-04-01", "startTime": "16:00", "stadiumId": "stade-c"
+  },
+  {
+    "id": "m-avril-b6", "tournamentId": "t-avril", "phaseId": "ph-avril-1", "phaseName": "Phase de Poules", "group": "Poule B",
+    "roundNumber": 3, "team1Id": "team-ess", "team2Id": "team-city", "status": "SCHEDULED",
+    "date": "2026-04-01", "startTime": "18:00", "stadiumId": "stade-d"
+  },
+
+  {
+    "id": "m-avril-df1", "tournamentId": "t-avril", "phaseId": "ph-avril-2", "phaseName": "Demi-finales",
+    "name": "Demi-finale 1", "roundNumber": 1, "status": "SCHEDULED",
+    "date": "2026-04-02", "startTime": "14:00", "stadiumId": "stade-a",
+    "team1Placeholder": "1er Poule A", "team1Source": { "kind": "rank", "groupName": "Poule A", "rank": 1 },
+    "team2Placeholder": "Meilleur 2e"
+  },
+  {
+    "id": "m-avril-df2", "tournamentId": "t-avril", "phaseId": "ph-avril-2", "phaseName": "Demi-finales",
+    "name": "Demi-finale 2", "roundNumber": 1, "status": "SCHEDULED",
+    "date": "2026-04-02", "startTime": "16:30", "stadiumId": "stade-a",
+    "team1Placeholder": "1er Poule B", "team1Source": { "kind": "rank", "groupName": "Poule B", "rank": 1 },
+    "team2Placeholder": "1er Poule C", "team2Source": { "kind": "rank", "groupName": "Poule C", "rank": 1 }
+  },
+
+  {
+    "id": "m-avril-pf", "tournamentId": "t-avril", "phaseId": "ph-avril-3", "phaseName": "Finale",
+    "name": "Petite finale", "roundNumber": 1, "status": "SCHEDULED",
+    "date": "2026-04-03", "startTime": "15:00", "stadiumId": "stade-a",
+    "team1Placeholder": "Perdant - Demi-finale 1", "team1Source": { "kind": "loser", "matchId": "m-avril-df1" },
+    "team2Placeholder": "Perdant - Demi-finale 2", "team2Source": { "kind": "loser", "matchId": "m-avril-df2" }
+  },
+  {
+    "id": "m-avril-fin", "tournamentId": "t-avril", "phaseId": "ph-avril-3", "phaseName": "Finale",
+    "name": "Finale", "roundNumber": 1, "status": "SCHEDULED",
+    "date": "2026-04-03", "startTime": "17:00", "stadiumId": "stade-a",
+    "team1Placeholder": "Gagnant - Demi-finale 1", "team1Source": { "kind": "winner", "matchId": "m-avril-df1" },
+    "team2Placeholder": "Gagnant - Demi-finale 2", "team2Source": { "kind": "winner", "matchId": "m-avril-df2" }
+  }
+]

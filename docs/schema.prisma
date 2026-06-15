@@ -1,0 +1,1279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tournament {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  description            String?
+  address                String?
+  category               String?
+  sport                  String?
+  status                 TournamentStatus         @default(DRAFT)
+  phases                 Phase[]
+  participants           TournamentParticipant[]
+  conflictRules          ConflictRule[]
+  configuration          Json?
+  startDate              DateTime                 @default(now())
+  endDate                DateTime                 @default(now())
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  deadline               DateTime                 @default(now())
+  startInscription       DateTime                 @default(now())
+  ageRangeStart          DateTime?
+  ageRangeEnd            DateTime?
+  finalMatchId           Int?                     @unique
+  finalComponentId       Int?                     @unique
+  winnerId               Int?                     @unique
+  winner                 Team?                    @relation("WonTournaments", fields: [winnerId], references: [id])
+  finalMatch             Match?                   @relation("finalMatch", fields: [finalMatchId], references: [id])
+  finalComponent         Component?               @relation("finalComponent", fields: [finalComponentId], references: [id])
+  PeriodDuration         Int?
+  numberOfPeriods        Int?
+  numberOfTeams          Int?
+  pauseBetweenPeriods    Int?
+  numberOfPlayersPerTeam Int?
+  startTime              DateTime?
+  endTime                DateTime?
+  withMatchEvents        Boolean                  @default(false)
+  file                   File?                    @relation(fields: [picture], references: [file_url], onDelete: SetDefault)
+  picture                String?
+  createdById            Int? // New field
+  createdBy              User?                    @relation("TournamentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  surfaceType            SurfaceType?
+  hostingTeam            String?
+  days                   TournamentDay[]
+  referees               Referee[]
+  users                  TournamentToUser[]
+  subTournaments         SubTournament[]
+  stadiums               Stadium[]
+  forms                  FormTemplate[]
+  announcements          Announcement[]
+  qrcode                 String?
+  finalRankings          TournamentFinalRanking[]
+  sponsors               Sponsor[]
+  sponsorDisplaySettings TournamentSponsorDisplaySettings?
+  isSimulation           Boolean                  @default(false)
+  simulationVersionId    String?
+  executedAt             DateTime?
+  simulationAuditLogs    SimulationAuditLog[]
+  notifications          Notification[]
+}
+
+enum SurfaceType {
+  NATURAL
+  SYNTHETIC
+  MIXED
+}
+
+model Announcement {
+  id           Int              @id @default(autoincrement())
+  type         AnnouncementType @default(ANNOUNCEMENT)
+  date         DateTime         @default(now())
+  name         String
+  description  String?
+  tournamentId Int
+  tournament   Tournament       @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+}
+
+enum AnnouncementType {
+  ANNOUNCEMENT
+  DELAY
+}
+
+enum FormTemplateType {
+  REGISTRATION
+  OTHER
+}
+
+model FormTemplate {
+  id              Int              @id @default(autoincrement())
+  tournamentId    Int              @unique
+  tournament      Tournament       @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  fields          FormField[]
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  type            FormTemplateType @default(OTHER)
+  formSubmissions FormSubmission[]
+}
+
+model FormSubmission {
+  id             Int                  @id @default(autoincrement())
+  formTemplateId Int
+  formTemplate   FormTemplate         @relation(fields: [formTemplateId], references: [id], onDelete: Cascade)
+  userId         Int
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  data           Json // Stores the submitted form data
+  submittedAt    DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  status         FormSubmissionStatus @default(PENDING)
+
+  @@index([formTemplateId])
+  @@index([userId])
+}
+
+enum FormSubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model FormField {
+  id             Int           @id @default(autoincrement())
+  formTemplateId Int
+  formTemplate   FormTemplate  @relation(fields: [formTemplateId], references: [id], onDelete: Cascade)
+  label          String
+  type           FormFieldType
+  required       Boolean       @default(false)
+  placeholder    String?
+  helpText       String?
+  options        Json? // For select, radio, checkbox options
+  validation     Json? // Validation rules (min, max, pattern, etc.)
+  order          Int           @default(0)
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum FormFieldType {
+  TEXT
+  EMAIL
+  NUMBER
+  PHONE
+  TEXTAREA
+  SELECT
+  MULTISELECT
+  RADIO
+  CHECKBOX
+  DATE
+  DATETIME
+  TIME
+  FILE
+  URL
+  BOOLEAN
+}
+
+model SubTournament {
+  id           Int        @id @default(autoincrement())
+  name         String
+  description  String?
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  phases Phase[]
+}
+
+model Phase {
+  id                     Int                      @id @default(autoincrement())
+  tournamentId           Int?
+  tournament             Tournament?              @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  subTournamentId        Int?
+  subTournament          SubTournament?           @relation(fields: [subTournamentId], references: [id], onDelete: Cascade)
+  name                   String
+  order                  Int
+  components             Component[]
+  pots                   Pot[]
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  stadiums               Stadium[]
+  stadiumId              Int?
+  type                   PhaseType                @default(DEFAULT)
+  configuration          PhaseConfiguration?
+  tournamentDays         TournamentDay[]
+  classificationCriteria ClassificationCriteria[] // Add this relation
+}
+
+model ClassificationCriteria {
+  id      Int    @id @default(autoincrement())
+  phaseId Int
+  phase   Phase  @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  name    String
+  order   Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([phaseId, order])
+}
+
+model PhaseConfiguration {
+  id      Int   @id @default(autoincrement())
+  phaseId Int   @unique
+  phase   Phase @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+
+  // Period configuration
+  periodDuration      Int? // Duration in minutes
+  numberOfPeriods     Int? // Number of periods per match
+  pauseBetweenPeriods Int? // Pause duration between periods in minutes
+  extraTimeDuration   Int? // Extra time duration if applicable
+
+  // Break configuration
+  breakBetweenMatches Int? // Break between matches in minutes
+  breakBetweenDays    Int? // Break between playing days in hours
+
+  // General settings
+  maxMatchesPerDay Int? // Maximum matches per day
+  startTime        String? // Default start time (e.g., "14:00")
+  endTime          String? // Latest end time (e.g., "22:00")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PhaseType {
+  POOL
+  MATCHES
+  DEFAULT
+}
+
+model Component {
+  id                 Int                    @id @default(autoincrement())
+  phaseId            Int
+  phase              Phase                  @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  type               ComponentType
+  name               String
+  // configuration or attributes -----
+  configuration      Json?
+  // or 
+  numberOfTeams      Int
+  numberOfMatches    Int // 1 or 2
+  interGroupPosition Int?
+  stadiums           Stadium[]
+  rankingCriteria    RankingSlotCriterion[] @relation("RankingCriterionComponent")
+
+  matches              Match[]
+  teams                Team[]              @relation("potTeams")
+  standings            Standing[]
+  teamSlots            TeamSlot[]
+  matchDuration        Int
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  TeamSlotCriterion    TeamSlotCriterion[]
+  isFinalForTournament Tournament?         @relation("finalComponent")
+  potSlots             PotSlot[]           @relation("fromComponent")
+  matchTies            MatchTie[]
+}
+
+model Pot {
+  id      Int       @id @default(autoincrement())
+  name    String
+  phaseId Int
+  phase   Phase     @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  slots   PotSlot[]
+}
+
+model PotSlot {
+  id              Int        @id @default(autoincrement())
+  potId           Int
+  pot             Pot        @relation(fields: [potId], references: [id], onDelete: Cascade)
+  teamId          Int?
+  team            Team?      @relation(fields: [teamId], references: [id])
+  fromComponentId Int?
+  fromComponent   Component? @relation("fromComponent", fields: [fromComponentId], references: [id])
+  matchId         Int?
+  Match           Match?     @relation("match", fields: [matchId], references: [id])
+  rankInComponent Int?
+}
+
+model Team {
+  id                    Int                           @id @default(autoincrement())
+  name                  String
+  isHost                Boolean                       @default(false)
+  hostType              HostType?
+  participants          TournamentParticipant[]
+  standings             Standing[]
+  teamSlots             TeamSlot[]
+  categories            Category[]
+  players               Player[]
+  wonTournaments        Tournament[]                  @relation("WonTournaments")
+  componentId           Int?
+  potSlots              PotSlot[]
+  pot                   Component?                    @relation("potTeams", fields: [componentId], references: [id], onDelete: SetDefault)
+  file                  File?                         @relation(fields: [picture], references: [file_url], onDelete: SetDefault)
+  picture               String?
+  createdAt             DateTime                      @default(now())
+  updatedAt             DateTime                      @updatedAt
+  GameLineup            GameLineup[]
+  MatchEvent            MatchEvent[]
+  deviceFavorites       DeviceFavorite[]
+  notifications         Notification[]
+  matchNotifPreferences MatchNotificationPreference[]
+  finalRankings         TournamentFinalRanking[]      @relation("FinalRankings")
+}
+
+enum HostType {
+  ORGANIZER
+  CO_HOST
+}
+
+model Category {
+  id          Int          @id @default(autoincrement())
+  name        String
+  team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId      Int
+  description String?
+  players     Player[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  GameLineup  GameLineup[]
+
+  @@unique([name, teamId])
+}
+
+model TournamentParticipant {
+  tournamentId     Int
+  teamId           Int
+  seed             Int?
+  isHost           Boolean                            @default(false)
+  hostType         HostType?
+  tournament       Tournament                         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  team             Team                               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt        DateTime                           @default(now())
+  updatedAt        DateTime                           @updatedAt
+  responsibleUsers TournamentParticipantResponsible[] // New relation for multiple responsible users
+  hasWithdrawn     Boolean                            @default(false)
+
+  @@id([tournamentId, teamId])
+}
+
+model TournamentParticipantResponsible {
+  id               Int                   @id @default(autoincrement())
+  tournamentId     Int
+  teamId           Int
+  participant      TournamentParticipant @relation(fields: [tournamentId, teamId], references: [tournamentId, teamId], onDelete: Cascade)
+  userId           Int
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPrimary        Boolean               @default(false) // Indicates if this is the primary responsible user
+  bio              String? // Biography for the responsible user
+  canCreate        Boolean               @default(false) // Permission to create tournament-related entities
+  canUpdate        Boolean               @default(false) // Permission to update tournament-related entities
+  canDelete        Boolean               @default(false) // Permission to delete tournament-related entities
+  canManagePlayers Boolean               @default(false) // Permission to manage players
+  canManageMatches Boolean               @default(false) // Permission to manage matches
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@unique([tournamentId, teamId, userId]) // Ensures a user is assigned only once per participant
+  @@index([tournamentId, teamId])
+  @@index([userId])
+}
+
+model Match {
+  id                       Int                 @id @default(autoincrement())
+  componentId              Int
+  name                     String?
+  component                Component           @relation(fields: [componentId], references: [id], onDelete: Cascade)
+  team1SlotId              Int
+  team2SlotId              Int
+  team1Slot                TeamSlot            @relation("Team1Slot", fields: [team1SlotId], references: [id], onDelete: Cascade)
+  team2Slot                TeamSlot            @relation("Team2Slot", fields: [team2SlotId], references: [id], onDelete: Cascade)
+  roundNumber              Int?
+  matchIdentifierInElement String?
+  location                 String?
+  score1                   Int?
+  score2                   Int?
+  score1BeforeForfeit      Int?
+  score2BeforeForfeit      Int?
+  startTime                DateTime            @default(now())
+  endTime                  DateTime            @default(now())
+  matchEvents              MatchEvent[]
+  status                   MatchStatus         @default(SCHEDULED)
+  date                     DateTime?
+  stadiumId                Int?
+  stadium                  Stadium?            @relation(fields: [stadiumId], references: [id], onDelete: Cascade)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  TeamSlotCriterion        TeamSlotCriterion[]
+  isFinalForTournament     Tournament?         @relation("finalMatch")
+  potSlots                 PotSlot[]           @relation("match")
+  periodTime               Int?
+  numberOfPeriods          Int?
+  team1Lineup              GameLineup?         @relation("Team1Lineup", fields: [team1LineupId], references: [id], onDelete: SetNull)
+  team1LineupId            Int?                @unique
+  currentTime              Int?
+
+  team2Lineup   GameLineup? @relation("Team2Lineup", fields: [team2LineupId], references: [id], onDelete: SetNull)
+  team2LineupId Int?        @unique
+
+  extraTimeScore1 Int?
+  extraTimeScore2 Int?
+
+  penaltyScore1 Int?
+  penaltyScore2 Int?
+
+  hasExtraTime Boolean @default(false)
+  hasPenalties Boolean @default(false)
+
+  extraTimeDuration        Int?
+  extraTimeNumberOfPeriods Int?
+  penaltyStartTime         DateTime?
+  periodType               PeriodType @default(REGULAR)
+  currentPeriod            Int?
+
+  standings       Standing[]             @relation("MatchStandings")
+  matchStandings  MatchStanding[]
+  notifications   Notification[]
+  referees        Referee[]              @relation("MatchReferees")
+  rankingCriteria RankingSlotCriterion[] @relation("RankingCriterionMatch")
+
+  matchTieId  Int? // Links to the MatchTie
+  matchTie    MatchTie? @relation("MatchTieMatches", fields: [matchTieId], references: [id], onDelete: Cascade)
+  isHomeMatch Boolean?
+  startedAt      DateTime? // ADD THIS - when timer last started
+  pausedAt       DateTime? // ADD THIS - when timer last paused // True for home match, false for away match, null for single matches
+  simulationVersionId String?
+}
+
+model MatchTie {
+  id               Int       @id @default(autoincrement())
+  componentId      Int
+  component        Component @relation(fields: [componentId], references: [id], onDelete: Cascade)
+  matches          Match[]   @relation("MatchTieMatches")
+  aggregateScore1  Int?
+  aggregateScore2  Int?
+  awayGoalsTeam1   Int? // Goals scored by team1 in the away match
+  awayGoalsTeam2   Int? // Goals scored by team2 in the away match
+  winnerTeamSlotId Int?
+  winnerTeamSlot   TeamSlot? @relation(fields: [winnerTeamSlotId], references: [id], onDelete: SetNull)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+enum PeriodType {
+  REGULAR // Regular match period (e.g., first half, second half)
+  EXTRA
+  PENALTIES // Extra time period (e.g., first extra period, second extra period)
+}
+
+model MatchStanding {
+  id         Int      @id @default(autoincrement())
+  matchId    Int
+  match      Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  standingId Int
+  standing   Standing @relation(fields: [standingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([matchId, standingId])
+}
+
+model GameLineup {
+  id          Int       @id @default(autoincrement())
+  title       String?
+  description String?
+  teamId      Int?
+  team        Team?     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  matchId      Int?
+  matchAsTeam1 Match? @relation("Team1Lineup")
+  matchAsTeam2 Match? @relation("Team2Lineup")
+
+  preview       String?
+  playersLineup PlayerLineup[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Player    Player?  @relation(fields: [playerId], references: [id])
+  playerId  Int?
+}
+
+model PlayerLineup {
+  playerId     Int
+  player       Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  gameLineupId Int
+  gameLineup   GameLineup @relation(fields: [gameLineupId], references: [id], onDelete: Cascade)
+  coords       Json
+
+  @@id([playerId, gameLineupId])
+}
+
+model MatchEvent {
+  id          Int                @id @default(autoincrement())
+  matchId     Int
+  match       Match              @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  type        GameMatchEventType
+  minute      Json
+  description String?
+
+  goalType GoalType?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  player     Player?  @relation(fields: [playerId], references: [id])
+  playerId   Int?
+  assistBy   Player?  @relation("AssistBy", fields: [assistById], references: [id])
+  assistById Int?
+  team       Team?    @relation(fields: [teamId], references: [id])
+  teamId     Int?
+
+  playerIn    Player? @relation("PlayerIn", fields: [playerInId], references: [id])
+  playerInId  Int?
+  playerOut   Player? @relation("PlayerOut", fields: [playerOutId], references: [id])
+  playerOutId Int?
+  simulationVersionId String?
+}
+
+enum GameMatchEventType {
+  GOAL_SCORED
+  GOAL_VAR
+  YELLOW_CARD
+  RED_CARD
+  SUBSTITUTION
+  BIG_CHANCE
+  PENALTY_MISSED
+  SHOOTOUT_GOAL // ✅ Goal scored in penalty shootout
+  SHOOTOUT_MISSED // ✅ Missed penalty in penalty shootout
+}
+
+enum GoalType {
+  PENALTY
+  DIRECT_FREE_KICK
+  INDIVIDUAL_ACTION
+  OWN_GOAL
+  FREE_KICK
+  CORNER
+  TEAM_ACTION
+  INDIVIDUAL_MISTAKE
+}
+
+model TeamSlot {
+  id             Int                 @id @default(autoincrement())
+  isBye          Boolean             @default(false)
+  componentId    Int?
+  component      Component?          @relation(fields: [componentId], references: [id], onDelete: Cascade)
+  teamId         Int?
+  team           Team?               @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  matchesAsTeam1 Match[]             @relation("Team1Slot")
+  matchesAsTeam2 Match[]             @relation("Team2Slot")
+  criterions     TeamSlotCriterion[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  matchTie       MatchTie[]
+}
+
+model Standing {
+  id             Int             @id @default(autoincrement())
+  componentId    Int
+  component      Component       @relation(fields: [componentId], references: [id], onDelete: Cascade)
+  teamId         Int
+  team           Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  rank           Int
+  points         Int
+  stats          Json?
+  matches        Match[]         @relation("MatchStandings")
+  matchStandings MatchStanding[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  simulationVersionId String?
+}
+
+model ConflictRule {
+  id           Int        @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  type         String
+  parameters   Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+enum TournamentStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+enum ComponentType {
+  POOL
+  BRACKET
+  FRIENDLY_MATCH
+  POT
+  MATCHES
+  INTER_GROUP
+}
+
+enum MatchStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  IN_PROGRESS
+  FORFEIT
+}
+
+///// Suggestion for refactoring creation into a model.
+model TeamSlotCriterion {
+  id         Int      @id @default(autoincrement())
+  teamSlot   TeamSlot @relation(fields: [teamSlotId], references: [id], onDelete: Cascade)
+  teamSlotId Int      @unique
+
+  matchId      Int?
+  match        Match?        @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  matchOutcome MatchOutcome?
+
+  componentId Int?
+  component   Component? @relation(fields: [componentId], references: [id], onDelete: SetNull)
+
+  rank      Int?
+  type      CriterionSourceType
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+enum MatchOutcome {
+  WINNER
+  LOSER
+}
+
+enum CriterionSourceType {
+  MATCH
+  COMPONENT
+}
+
+model Stadium {
+  id             Int                   @id @default(autoincrement())
+  name           String
+  tournamentId   Int?
+  tournament     Tournament?           @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  phases         Phase[]
+  location       String
+  availibilities StadiumAvailability[]
+
+  pauses       StadiumPause[]
+  customPauses CustomStadiumPause[]
+  matches      Match[]
+  components   Component[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model StadiumAvailability {
+  id        Int      @id @default(autoincrement())
+  stadiumId Int
+  stadium   Stadium  @relation(fields: [stadiumId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StadiumPause {
+  id        Int      @id @default(autoincrement())
+  stadiumId Int
+  stadium   Stadium  @relation(fields: [stadiumId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+}
+
+model CustomStadiumPause {
+  id        Int     @id @default(autoincrement())
+  stadium   Stadium @relation(fields: [stadiumId], references: [id], onDelete: Cascade)
+  stadiumId Int
+
+  startTime DateTime // Format: "HH:mm"
+  endTime   DateTime
+
+  reason    String? // Optional: like "maintenance", "special event", etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TournamentDay {
+  id            Int                  @id @default(autoincrement())
+  tournamentId  Int
+  tournament    Tournament           @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  startDateTime DateTime
+  endDateTime   DateTime
+  pauses        TournamentDayPause[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  phases        Phase[]
+}
+
+model TournamentDayPause {
+  id              Int           @id @default(autoincrement())
+  tournamentDayId Int
+  tournamentDay   TournamentDay @relation(fields: [tournamentDayId], references: [id], onDelete: Cascade)
+  startTime       DateTime
+  endTime         DateTime
+}
+
+enum TournamentToUserRole {
+  OWNER
+  ADMIN
+  ACTOR
+}
+
+model TournamentToUser {
+  id           Int                  @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament           @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId       Int
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         TournamentToUserRole
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model User {
+  id                      Int                                @id @default(autoincrement())
+  name                    String
+  email                   String                             @unique
+  password                String
+  file                    File?                              @relation(fields: [picture], references: [file_url], onDelete: SetDefault)
+  picture                 String?
+  idIsmartClub            String?
+  createdAt               DateTime                           @default(now())
+  updatedAt               DateTime                           @updatedAt
+  jwtVersion              Int                                @default(0)
+  deleted                 Boolean                            @default(false)
+  deletionReason          String?
+  TournamentToUser        TournamentToUser[]
+  Referee                 Referee[]
+  File                    File[]                             @relation("createdBy")
+  tournaments             Tournament[]                       @relation("TournamentCreatedBy")
+  tournamentTemplates     TournamentTemplate[]               @relation("TournamentTemplateCreatedBy")
+  responsibleParticipants TournamentParticipantResponsible[]
+  formSubmissions         FormSubmission[]
+  notifications           Notification[]
+  fcmPushNotifications    FCMPushNotification[]
+  role                    Role                               @default(USER)
+  /// IANA timezone (e.g. Europe/Paris) for user-local scheduling and display.
+  timezone                String?
+  subscriptions           Subscription[]
+  simulationAuditLogs     SimulationAuditLog[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Referee {
+  id           Int             @id @default(autoincrement())
+  name         String
+  file         File?           @relation(fields: [picture], references: [file_url], onDelete: SetDefault)
+  picture      String?
+  userId       Int?
+  user         User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  birthdate    DateTime?
+  tournamentId Int
+  tournament   Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  category     RefereeCategory @default(MAIN)
+  matches      Match[]         @relation("MatchReferees")
+}
+
+enum RefereeCategory {
+  VAR
+  ASSISTANT
+  MAIN
+}
+
+model Player {
+  id                  Int              @id @default(autoincrement())
+  name                String
+  teamId              Int
+  team                Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  categoryId          Int?
+  category            Category?        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  file                File?            @relation(fields: [picture], references: [file_url], onDelete: SetDefault)
+  picture             String?
+  idIsmartClub        String?
+  birthdate           DateTime?
+  position            String?
+  gameLineups         GameLineup[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  PlayerLineup        PlayerLineup[]
+  matchEvents         MatchEvent[]
+  matchEventPlayerIn  MatchEvent[]     @relation("PlayerIn")
+  matchEventPlayerOut MatchEvent[]     @relation("PlayerOut")
+  matchEventAssists   MatchEvent[]     @relation("AssistBy")
+  deviceFavorites     DeviceFavorite[]
+  notifications       Notification[]
+}
+
+model File {
+  file_url    String       @id
+  file_name   String?
+  createdBy   User?        @relation("createdBy", fields: [userId], references: [id])
+  userId      Int?
+  tournaments Tournament[]
+  players     Player[]
+  teams       Team[]
+  createdAt   DateTime     @default(now())
+  referees    Referee[]
+  users       User[]
+}
+
+model DeviceFavorite {
+  id        Int      @id @default(autoincrement())
+  deviceId  String
+  teamId    Int?
+  playerId  Int?
+  team      Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  player    Player?  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model MatchNotificationPreference {
+  id            Int      @id @default(autoincrement())
+  deviceId      String
+  teamId        Int
+  minutesBefore Int      @default(30)
+  team          Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([deviceId, teamId]) // one preference per device per team
+}
+
+model Notification {
+  id                  Int               @id @default(autoincrement())
+  deviceId            String
+  message             String
+  type                NotificationType?
+  teamId              Int?
+  playerId            Int?
+  matchId             Int?
+  userId              Int?
+  tournamentId        Int?
+  team                Team?             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  player              Player?           @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  match               Match?            @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user                User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tournament          Tournament?       @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  createdAt           DateTime          @default(now())
+  isRead              Boolean           @default(false)
+  simulationVersionId String?
+}
+
+model FCMPushNotification {
+  id       String  @id @default(uuid())
+  deviceId String  @unique
+  fcmToken String
+  platform String?
+  user     User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   Int?
+
+  createdAt DateTime @default(now())
+  lastUsed  DateTime @default(now())
+}
+
+enum NotificationType {
+  MATCH_EVENT
+  GAME_LINEUP
+  TOURNAMENT_SUBMISSION
+  SUBMISSION_ACCEPTED
+  SUBMISSION_DECLINED
+  MATCH_DELAY
+  SIMULATION_EXECUTED
+}
+
+model PricingPackage {
+  id          Int     @id @default(autoincrement())
+  name        String // e.g. "Individual – Max 32 teams"
+  slug        String  @unique
+  description String?
+
+  type PackageType // INDIVIDUAL or COLLECTIVE
+
+  price        Decimal
+  currency     String        @default("EUR")
+  billingCycle BillingCycle? // MONTHLY, YEARLY, ONE_TIME
+
+  promotionalPrice       Decimal?
+  promotionalDescription String?
+  promotionalStartsAt    DateTime?
+  promotionalEndsAt      DateTime?
+  stripeProductId        String? // Stripe Price ID (0 € for now)
+
+  stripePriceId      String? // Stripe Price ID (0 € for now)
+  maxTeams           Int?
+  maxTournaments     Int?
+  canCreateUnlimited Boolean @default(false)
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  packageId Int
+  package   PricingPackage @relation(fields: [packageId], references: [id])
+
+  // Payment info
+  stripePriceId        String? // if using Stripe
+  stripeSubscriptionId String? // null for one-time purchases
+
+  status          SubscriptionStatus @default(ACTIVE)
+  stripeSessionId String? // NEW
+
+  price      Decimal?
+  // Dates
+  startsAt   DateTime  @default(now())
+  endsAt     DateTime? // null = never expires (lifetime or one-time)
+  canceledAt DateTime?
+
+  // Usage tracking (important!)
+  tournamentsCreatedCount Int  @default(0)
+  maxTournamentsAllowed   Int? // copied from package at purchase time (for historical accuracy)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ──────────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────────
+enum PackageType {
+  INDIVIDUAL
+  COLLECTIVE
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  ONE_TIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING
+  CANCELED
+  EXPIRED
+  PAST_DUE
+}
+
+model TournamentFinalRanking {
+  id           Int        @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  position       Int
+  resolvedTeamId Int?
+  resolvedTeam   Team? @relation("FinalRankings", fields: [resolvedTeamId], references: [id], onDelete: SetNull)
+
+  criterion RankingSlotCriterion?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tournamentId, position])
+}
+
+model RankingSlotCriterion {
+  id        Int                    @id @default(autoincrement())
+  rankingId Int                    @unique
+  ranking   TournamentFinalRanking @relation(fields: [rankingId], references: [id], onDelete: Cascade)
+
+  type         CriterionSourceType
+  matchId      Int?
+  match        Match?              @relation("RankingCriterionMatch", fields: [matchId], references: [id], onDelete: SetNull)
+  matchOutcome MatchOutcome?
+  componentId  Int?
+  component    Component?          @relation("RankingCriterionComponent", fields: [componentId], references: [id], onDelete: SetNull)
+  rank         Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ──────────────────────────────────────────────────
+// Tournament Template models
+// ──────────────────────────────────────────────────
+
+model TournamentTemplate {
+  id            Int                      @id @default(autoincrement())
+  name          String
+  description   String?
+  sport         String?
+  category      String?
+  configuration Json?                    // mirrors Tournament.configuration
+
+  // match settings snapshot
+  PeriodDuration         Int?
+  numberOfPeriods        Int?
+  numberOfTeams          Int?
+  pauseBetweenPeriods    Int?
+  numberOfPlayersPerTeam Int?
+  withMatchEvents        Boolean          @default(false)
+  createdById        Int?
+  createdBy          User?            @relation("TournamentTemplateCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  phases         TemplatePhase[]
+  subTournaments TemplateSubTournament[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TemplateSubTournament {
+  id          Int                 @id @default(autoincrement())
+  templateId  Int
+  template    TournamentTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  order       Int                 @default(0)
+  phases      TemplatePhase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TemplatePhase {
+  id              Int                      @id @default(autoincrement())
+  templateId      Int
+  template        TournamentTemplate       @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  subTemplateId   Int?
+  subTemplate     TemplateSubTournament?   @relation(fields: [subTemplateId], references: [id], onDelete: Cascade)
+  name            String
+  order           Int
+  type            PhaseType                @default(DEFAULT)
+  // stored as [{name, order}]
+  classificationCriteria Json?
+
+  configuration   TemplatePhaseConfig?
+  components      TemplateComponent[]
+  pots            TemplatePot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TemplatePhaseConfig {
+  id              Int           @id @default(autoincrement())
+  templatePhaseId Int           @unique
+  templatePhase   TemplatePhase @relation(fields: [templatePhaseId], references: [id], onDelete: Cascade)
+
+  periodDuration      Int?
+  numberOfPeriods     Int?
+  pauseBetweenPeriods Int?
+  extraTimeDuration   Int?
+  breakBetweenMatches Int?
+  breakBetweenDays    Int?
+  maxMatchesPerDay    Int?
+  startTime           String?
+  endTime             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TemplateComponent {
+  id              Int           @id @default(autoincrement())
+  templatePhaseId Int
+  templatePhase   TemplatePhase @relation(fields: [templatePhaseId], references: [id], onDelete: Cascade)
+
+  type               ComponentType
+  name               String
+  order              Int           @default(0)
+  numberOfTeams      Int
+  numberOfMatches    Int
+  matchDuration      Int
+  interGroupPosition Int?
+  configuration      Json?
+
+  teamSlots    TemplateTeamSlot[]
+  matches      TemplateMatch[]
+  potSlotsFrom TemplatePotSlot[]  @relation("TplPotSlotFromComp")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Bracket slots without team assignment (structure only).
+model TemplateTeamSlot {
+  id                  Int               @id @default(autoincrement())
+  templateComponentId Int
+  templateComponent   TemplateComponent @relation(fields: [templateComponentId], references: [id], onDelete: Cascade)
+  isBye               Boolean           @default(false)
+  matchesAsTeam1      TemplateMatch[]   @relation("TplMatchTeam1")
+  matchesAsTeam2      TemplateMatch[]   @relation("TplMatchTeam2")
+
+  @@index([templateComponentId])
+}
+
+model TemplateMatch {
+  id                       Int               @id @default(autoincrement())
+  templateComponentId      Int
+  templateComponent        TemplateComponent @relation(fields: [templateComponentId], references: [id], onDelete: Cascade)
+  name                     String?
+  roundNumber              Int?
+  matchIdentifierInElement String?
+  team1TemplateSlotId      Int
+  team1Slot                TemplateTeamSlot  @relation("TplMatchTeam1", fields: [team1TemplateSlotId], references: [id], onDelete: Cascade)
+  team2TemplateSlotId      Int
+  team2Slot                TemplateTeamSlot  @relation("TplMatchTeam2", fields: [team2TemplateSlotId], references: [id], onDelete: Cascade)
+  hasExtraTime             Boolean           @default(false)
+  hasPenalties             Boolean           @default(false)
+  extraTimeDuration        Int?
+  extraTimeNumberOfPeriods Int?
+  periodTime               Int?
+  numberOfPeriods          Int?
+  periodType               PeriodType        @default(REGULAR)
+  potSlots                 TemplatePotSlot[]
+
+  @@index([templateComponentId])
+}
+
+model TemplatePot {
+  id              Int               @id @default(autoincrement())
+  templatePhaseId Int
+  templatePhase   TemplatePhase     @relation(fields: [templatePhaseId], references: [id], onDelete: Cascade)
+  name            String
+  slots           TemplatePotSlot[]
+}
+
+model TemplatePotSlot {
+  id              Int                @id @default(autoincrement())
+  templatePotId   Int
+  templatePot     TemplatePot        @relation(fields: [templatePotId], references: [id], onDelete: Cascade)
+  fromComponentId Int?
+  fromComponent   TemplateComponent? @relation("TplPotSlotFromComp", fields: [fromComponentId], references: [id], onDelete: SetNull)
+  templateMatchId Int?
+  templateMatch   TemplateMatch?     @relation(fields: [templateMatchId], references: [id], onDelete: SetNull)
+  rankInComponent Int?
+}
+
+// --- Tournament sponsorship (vitrine, écrans publics, live) ---
+
+enum SponsorMediaType {
+  IMAGE_STATIC
+  GIF
+  VIDEO_MP4
+}
+
+enum SponsorBannerFormat {
+  RATIO_728x90
+  RATIO_300x250
+  RATIO_1920x300
+  CUSTOM
+}
+
+enum SponsorBannerPlacement {
+  INLINE
+  STICKY_HEADER
+  STICKY_FOOTER
+  SIDEBAR
+  PUBLIC_SCREEN_TOP
+  PUBLIC_SCREEN_SIDE
+}
+
+enum SponsorDisplayMode {
+  NORMAL
+  ARENA_SLIDESHOW
+}
+
+enum SponsorRotationMode {
+  WEIGHTED_ROUND_ROBIN
+  STRICT_PRIORITY_ORDER
+}
+
+/// One row per tournament: timezone for scheduling UI, arena slideshow timing, rotation rule.
+model TournamentSponsorDisplaySettings {
+  id                   Int                 @id @default(autoincrement())
+  tournamentId         Int                 @unique
+  tournament           Tournament          @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  /// IANA timezone (e.g. Europe/Paris) for interpreting organiser schedule in UI; store start/end in UTC.
+  timezone             String?
+  arenaSlideSeconds    Int                 @default(10)
+  rotationMode         SponsorRotationMode @default(WEIGHTED_ROUND_ROBIN)
+  /// If true, organiser declares third-party measurement pixels may be used (cookies / consent flow on front).
+  externalTrackingHint Boolean             @default(false)
+  privacyNote          String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+}
+
+model Sponsor {
+  id           Int             @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  name         String
+  logoUrl      String?
+  websiteUrl   String?
+  isActive     Boolean         @default(true)
+  displayOrder Int             @default(0)
+  banners      SponsorBanner[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([tournamentId])
+}
+
+model SponsorBanner {
+  id                       Int                    @id @default(autoincrement())
+  sponsorId                Int
+  sponsor                  Sponsor                @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  mediaUrl                 String
+  mediaType                SponsorMediaType       @default(IMAGE_STATIC)
+  formatPreset             SponsorBannerFormat    @default(CUSTOM)
+  targetUrl                String?
+  /// Declared dimensions (crop / preview); recommended presets: 728x90, 300x250, 1920x300
+  width                    Int?
+  height                   Int?
+  fileSizeBytes            Int?
+  /// Seconds this creative stays visible in one rotation step (front-end carousel).
+  displayDurationSeconds   Int                    @default(8)
+  /// Relative frequency in weighted round-robin (higher = more often).
+  weight                   Int                    @default(1)
+  /// Higher runs first in STRICT_PRIORITY_ORDER and tie-breaks after principal flag.
+  priority                 Int                    @default(0)
+  /// Principal / “always-on” sponsor: front should keep in rotation with highest precedence.
+  isPrincipal              Boolean                @default(false)
+  placement                SponsorBannerPlacement @default(INLINE)
+  displayMode              SponsorDisplayMode     @default(NORMAL)
+  displayStartsAt          DateTime?
+  displayEndsAt            DateTime?
+  /// For MP4: max 10s enforced in application layer; optional stored duration (seconds).
+  videoDurationSeconds     Int?
+  impressionCount          Int                    @default(0)
+  clickCount               Int                    @default(0)
+  isActive                 Boolean                @default(true)
+  externalTrackingNote     String?
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+
+  @@index([sponsorId])
+  @@index([placement])
+}
+
+enum SimulationAction {
+  SIMULATION_ENABLED
+  SIMULATION_DISABLED
+  TEST_DATA_GENERATED
+  EXECUTED
+}
+
+model SimulationAuditLog {
+  id           Int              @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament       @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId       Int
+  user         User             @relation(fields: [userId], references: [id])
+  action       SimulationAction
+  details      Json?
+  createdAt    DateTime         @default(now())
+}

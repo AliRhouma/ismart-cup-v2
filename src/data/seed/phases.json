@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ph-avril-1",
+    "tournamentId": "t-avril",
+    "name": "Phase de Poules",
+    "order": 1,
+    "status": "done",
+    "kind": "GROUPS",
+    "groups": [
+      { "id": "grp-a", "name": "Poule A", "slots": ["team-rma", "team-int", "team-fcb", "team-psg"] },
+      { "id": "grp-b", "name": "Poule B", "slots": ["team-ess", "team-mil", "team-bay", "team-city"] },
+      { "id": "grp-c", "name": "Poule C", "slots": ["team-ajax", "team-est", "team-ca", "team-marsa"] }
+    ]
+  },
+  { "id": "ph-avril-2", "tournamentId": "t-avril", "name": "Demi-finales", "order": 2, "status": "current", "kind": "KNOCKOUT" },
+  { "id": "ph-avril-3", "tournamentId": "t-avril", "name": "Finale", "order": 3, "status": "upcoming", "kind": "KNOCKOUT" },
+
+  { "id": "ph-final-1", "tournamentId": "t-final", "name": "Demi-finales", "order": 1, "status": "done" },
+  { "id": "ph-final-2", "tournamentId": "t-final", "name": "Finale", "order": 2, "status": "done" }
+]

@@ -2,7 +2,15 @@
   { "id": "team-rma", "tournamentId": "t-avril", "name": "Real Madrid", "category": "Poule A", "favorite": true },
   { "id": "team-int", "tournamentId": "t-avril", "name": "INTER", "category": "Poule A", "favorite": false },
   { "id": "team-fcb", "tournamentId": "t-avril", "name": "FCB", "category": "Poule A", "favorite": true },
+  { "id": "team-psg", "tournamentId": "t-avril", "name": "Paris Saint-Germain", "category": "Poule A", "favorite": false },
+
   { "id": "team-ess", "tournamentId": "t-avril", "name": "ESS", "category": "Poule B", "favorite": false },
   { "id": "team-mil", "tournamentId": "t-avril", "name": "MILAN", "category": "Poule B", "favorite": false },
-  { "id": "team-bay", "tournamentId": "t-avril", "name": "Bayern Munich", "category": "Poule B", "favorite": false }
+  { "id": "team-bay", "tournamentId": "t-avril", "name": "Bayern Munich", "category": "Poule B", "favorite": false },
+  { "id": "team-city", "tournamentId": "t-avril", "name": "Manchester City", "category": "Poule B", "favorite": true },
+
+  { "id": "team-ajax", "tournamentId": "t-avril", "name": "Ajax Amsterdam", "category": "Poule C", "favorite": false },
+  { "id": "team-est", "tournamentId": "t-avril", "name": "Espérance de Tunis", "category": "Poule C", "favorite": true },
+  { "id": "team-ca", "tournamentId": "t-avril", "name": "Club Africain", "category": "Poule C", "favorite": false },
+  { "id": "team-marsa", "tournamentId": "t-avril", "name": "AS Marsa Académie des Jeunes Talents", "category": "Poule C", "favorite": false }
 ]

@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom"
 import { ChevronRight, Plus, Trophy } from "lucide-react"
 import type { Tournament } from "@/data/types"
-
-// Placeholder data — real data will come from a Zustand store + seed JSON later.
-const DEMO_TOURNAMENTS: Tournament[] = [
-  { id: "t-avril", name: "Test Tournois AVRIL", startDate: "2026-04-01", status: "active", teamCount: 8 },
-  { id: "t-final", name: "Final Tournament", startDate: "2025-05-27", status: "finished", teamCount: 4 },
-  { id: "t-ete", name: "Coupe d'Été", startDate: "2026-07-12", status: "upcoming", teamCount: 0 },
-]
+import { useTournaments } from "@/stores/useTournaments"
 
 const STATUS: Record<Tournament["status"], { label: string; cls: string }> = {
   upcoming: { label: "À venir", cls: "bg-brand-50 text-brand-700" },
@@ -16,6 +10,8 @@ const STATUS: Record<Tournament["status"], { label: string; cls: string }> = {
 }
 
 export default function TournamentList() {
+  const tournaments = useTournaments((s) => s.tournaments)
+
   return (
     <div className="min-h-screen bg-surface-subtle">
       <main className="container py-8">
@@ -32,7 +28,7 @@ export default function TournamentList() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {DEMO_TOURNAMENTS.map((t) => {
+          {tournaments.map((t) => {
             const status = STATUS[t.status]
             return (
               <div key={t.id} className="rounded-xl border border-border bg-surface p-5 shadow-sm">

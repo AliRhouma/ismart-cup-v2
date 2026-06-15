@@ -1,0 +1,14 @@
+[
+  {
+    "id": "reg-avril-1", "tournamentId": "t-avril", "clubName": "US Monastir",
+    "responsibleName": "Karim Haddad", "playersCount": 14, "status": "PENDING", "date": "2026-03-24"
+  },
+  {
+    "id": "reg-avril-2", "tournamentId": "t-avril", "clubName": "CA Bizertin",
+    "responsibleName": "Sofiane Mbarek", "playersCount": 11, "status": "PENDING", "date": "2026-03-22"
+  },
+  {
+    "id": "reg-avril-3", "tournamentId": "t-avril", "clubName": "Olympique de Béja",
+    "responsibleName": "Nabil Trabelsi", "playersCount": 9, "status": "REJECTED", "date": "2026-03-19"
+  }
+]

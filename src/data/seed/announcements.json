@@ -1,0 +1,17 @@
+[
+  {
+    "id": "ann-avril-1", "tournamentId": "t-avril", "type": "ANNOUNCEMENT", "date": "2026-03-15",
+    "name": "Inscriptions ouvertes",
+    "description": "Les inscriptions des équipes sont ouvertes jusqu'au 28 mars."
+  },
+  {
+    "id": "ann-avril-2", "tournamentId": "t-avril", "type": "ANNOUNCEMENT", "date": "2026-04-02",
+    "name": "Tirage des demi-finales",
+    "description": "Le tirage au sort des demi-finales aura lieu à 12h00 sur le terrain central."
+  },
+  {
+    "id": "ann-avril-3", "tournamentId": "t-avril", "type": "DELAY", "date": "2026-04-01",
+    "name": "Report du coup d'envoi",
+    "description": "Le match d'ouverture débutera avec 30 minutes de retard."
+  }
+]

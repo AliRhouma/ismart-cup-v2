@@ -1,0 +1,13 @@
+[
+  { "id": "ref-avril-1", "tournamentId": "t-avril", "name": "Mehdi Jelassi", "category": "MAIN" },
+  { "id": "ref-avril-2", "tournamentId": "t-avril", "name": "Hatem Khalfaoui", "category": "MAIN" },
+  { "id": "ref-avril-3", "tournamentId": "t-avril", "name": "Sami Ben Ali", "category": "ASSISTANT" },
+  { "id": "ref-avril-4", "tournamentId": "t-avril", "name": "Walid Gharbi", "category": "ASSISTANT" },
+  { "id": "ref-avril-5", "tournamentId": "t-avril", "name": "Anis Bouzid", "category": "ASSISTANT" },
+  { "id": "ref-avril-6", "tournamentId": "t-avril", "name": "Riadh Mansour", "category": "ASSISTANT" },
+  { "id": "ref-avril-7", "tournamentId": "t-avril", "name": "Fethi Naimi", "category": "VAR" },
+  { "id": "ref-avril-8", "tournamentId": "t-avril", "name": "Slim Ayari", "category": "VAR" },
+  { "id": "ref-final-1", "tournamentId": "t-final", "name": "Tarek Dridi", "category": "MAIN" },
+  { "id": "ref-final-2", "tournamentId": "t-final", "name": "Karim Saidi", "category": "ASSISTANT" },
+  { "id": "ref-final-3", "tournamentId": "t-final", "name": "Lotfi Hamdi", "category": "VAR" }
+]

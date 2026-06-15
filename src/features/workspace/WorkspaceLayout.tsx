@@ -1,4 +1,6 @@
-import { Link, NavLink, Outlet, useParams } from "react-router-dom"
+import { useEffect, useRef, useState } from "react"
+import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom"
+import { toast } from "sonner"
 import {
   ArrowLeft,
   BarChart3,
@@ -7,10 +9,13 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Moon,
+  MoreVertical,
+  Pencil,
   Settings,
   Shuffle,
   Star,
   Sun,
+  Trash2,
   Trophy,
   UserCheck,
   Users,
@@ -18,6 +23,16 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/app/providers"
+import { useTournaments } from "@/stores/useTournaments"
+import ConfirmDialog from "@/components/kit/ConfirmDialog"
+import TournamentInfoSheet from "@/features/workspace/TournamentInfoSheet"
+import type { TournamentStatus } from "@/data/types"
+
+const STATUS_BADGE: Record<TournamentStatus, { label: string; cls: string }> = {
+  upcoming: { label: "À venir", cls: "bg-brand-50 text-brand-700" },
+  active: { label: "En cours", cls: "bg-success-50 text-success-700" },
+  finished: { label: "Terminé", cls: "bg-neutral-100 text-neutral-600" },
+}
 
 interface WorkspaceTab {
   id: string
@@ -46,8 +61,41 @@ export const WORKSPACE_TABS: WorkspaceTab[] = [
 
 export default function WorkspaceLayout() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
+  const tournament = useTournaments((s) => s.tournaments).find((t) => t.id === id)
+  const removeTournament = useTournaments((s) => s.removeTournament)
   const base = `/tournaments/${id}`
+  const status = tournament ? STATUS_BADGE[tournament.status] : null
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Close the ⋮ menu on outside click / Escape.
+  useEffect(() => {
+    if (!menuOpen) return
+    function onPointerDown(e: PointerEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false)
+    }
+    document.addEventListener("pointerdown", onPointerDown)
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown)
+      document.removeEventListener("keydown", onKey)
+    }
+  }, [menuOpen])
+
+  function handleDelete() {
+    if (!tournament) return
+    removeTournament(tournament.id)
+    toast.success(`« ${tournament.name} » supprimé.`)
+    navigate("/tournaments")
+  }
 
   return (
     <div className="min-h-screen bg-surface-subtle">
@@ -60,10 +108,14 @@ export default function WorkspaceLayout() {
           >
             <ArrowLeft className="size-5" />
           </Link>
-          <h1 className="text-xl font-semibold tracking-tight text-ink">Espace tournoi</h1>
-          <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-600">
-            {id}
-          </span>
+          <h1 className="truncate text-xl font-semibold tracking-tight text-ink">
+            {tournament?.name ?? "Espace tournoi"}
+          </h1>
+          {status && (
+            <span className={cn("shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium", status.cls)}>
+              {status.label}
+            </span>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={toggleTheme}
@@ -72,6 +124,48 @@ export default function WorkspaceLayout() {
             >
               {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
             </button>
+
+            {tournament && (
+              <div ref={menuRef} className="relative">
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-label="Actions du tournoi"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  className="grid size-9 place-items-center rounded-lg text-ink-muted transition hover:bg-neutral-100 hover:text-ink"
+                >
+                  <MoreVertical className="size-5" />
+                </button>
+                {menuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-11 z-30 w-56 rounded-xl border border-border bg-surface-raised p-1.5 shadow-lg"
+                  >
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuOpen(false)
+                        setInfoOpen(true)
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-ink transition hover:bg-neutral-100"
+                    >
+                      <Pencil className="size-4 text-ink-muted" /> Modifier les informations
+                    </button>
+                    <div className="my-1 h-px bg-border" />
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuOpen(false)
+                        setConfirmOpen(true)
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-danger-600 transition hover:bg-danger-50"
+                    >
+                      <Trash2 className="size-4" /> Supprimer le tournoi
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -99,6 +193,20 @@ export default function WorkspaceLayout() {
       <main className="p-6">
         <Outlet />
       </main>
+
+      {tournament && (
+        <>
+          <TournamentInfoSheet tournament={tournament} open={infoOpen} onOpenChange={setInfoOpen} />
+          <ConfirmDialog
+            open={confirmOpen}
+            onOpenChange={setConfirmOpen}
+            title={`Supprimer « ${tournament.name} » ?`}
+            description="Cette action est irréversible. Le tournoi et tout son espace de travail seront définitivement retirés."
+            confirmLabel="Supprimer le tournoi"
+            onConfirm={handleDelete}
+          />
+        </>
+      )}
     </div>
   )
 }

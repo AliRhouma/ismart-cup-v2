@@ -1,0 +1,8 @@
+[
+  { "id": "stade-a", "tournamentId": "t-avril", "name": "Terrain Central", "location": "Complexe El Menzah" },
+  { "id": "stade-b", "tournamentId": "t-avril", "name": "Terrain Nord", "location": "Complexe El Menzah" },
+  { "id": "stade-c", "tournamentId": "t-avril", "name": "Terrain Sud", "location": "Complexe El Menzah" },
+  { "id": "stade-d", "tournamentId": "t-avril", "name": "Terrain Annexe", "location": "Complexe El Menzah" },
+  { "id": "stade-final-1", "tournamentId": "t-final", "name": "Stade Olympique", "location": "Radès" },
+  { "id": "stade-ete-1", "tournamentId": "t-ete", "name": "Terrain Principal", "location": "Sousse" }
+]
