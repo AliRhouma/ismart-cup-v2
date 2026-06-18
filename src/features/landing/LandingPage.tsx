@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react";
+import { useState, Fragment, type ReactElement } from "react";
 
 /* ============================================================================
    iSmart Cup — Landing Page (single self-contained file)
@@ -125,7 +125,9 @@ export default function IsmartCupLanding() {
         </a>
         <ul className={`ic-nav-links ${menuOpen ? "is-open" : ""}`}>
           <li><a href="#etapes">Étapes</a></li>
+          <li><a href="#modeles">Modèles</a></li>
           <li><a href="#features">Fonctionnalités</a></li>
+          <li><a href="#public">Vitrine</a></li>
           <li><a href="#tarifs">Tarifs</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
@@ -149,7 +151,6 @@ export default function IsmartCupLanding() {
 
         <div className="ic-hero-inner">
           <span className="ic-badge">
-            <span className="ic-badge-dot" />
             Plateforme de gestion de tournois sportifs
           </span>
 
@@ -165,9 +166,7 @@ export default function IsmartCupLanding() {
 
           <div className="ic-hero-cta">
             <button className="ic-btn ic-btn-primary ic-btn-lg">Créer un tournoi</button>
-            <button className="ic-btn ic-btn-outline ic-btn-lg">
-              Voir une démo <IconArrow />
-            </button>
+            <button className="ic-btn ic-btn-outline ic-btn-lg">Se connecter</button>
           </div>
 
           <div className="ic-stores">
@@ -186,6 +185,9 @@ export default function IsmartCupLanding() {
           <div className="ic-float ic-float-1"><MockStandings compact /></div>
           <div className="ic-float ic-float-2"><MockMatch /></div>
           <div className="ic-float ic-float-3"><MockBracketNode /></div>
+          <div className="ic-float ic-float-4"><MockTimeline /></div>
+          <div className="ic-float ic-float-5"><MockScorers /></div>
+          <div className="ic-float ic-float-6"><MockBracket /></div>
         </div>
       </header>
 
@@ -225,6 +227,9 @@ export default function IsmartCupLanding() {
         </ol>
       </section>
 
+      {/* TEMPLATES */}
+      <TemplatesShowcase />
+
       {/* FEATURES */}
       <section id="features" className="ic-section ic-section-muted">
         <div className="ic-section-head">
@@ -241,6 +246,9 @@ export default function IsmartCupLanding() {
           ))}
         </div>
       </section>
+
+      {/* PUBLIC PAGE */}
+      <PublicShowcase />
 
       {/* PRICING */}
       <section id="tarifs" className="ic-section">
@@ -276,12 +284,23 @@ export default function IsmartCupLanding() {
       {/* CTA BAND */}
       <section id="contact" className="ic-cta">
         <div className="ic-cta-inner">
-          <IconTrophy className="ic-cta-trophy" />
-          <h2 className="ic-cta-title">Prêt à lancer votre tournoi&nbsp;?</h2>
-          <p className="ic-cta-sub">Créez votre première compétition gratuitement, en moins de cinq minutes.</p>
-          <div className="ic-hero-cta">
-            <button className="ic-btn ic-btn-primary ic-btn-lg">Créer un tournoi</button>
-            <button className="ic-btn ic-btn-outline ic-btn-lg ic-btn-on-band">Parler à l'équipe</button>
+          <div className="ic-cta-bg" aria-hidden>
+            <div className="ic-cta-grid" />
+            <div className="ic-cta-glow" />
+          </div>
+          <div className="ic-cta-content">
+            <span className="ic-cta-eyebrow">Lancez-vous aujourd'hui</span>
+            <h2 className="ic-cta-title">Prêt à lancer votre tournoi&nbsp;?</h2>
+            <p className="ic-cta-sub">Créez votre première compétition gratuitement, en moins de cinq minutes.</p>
+            <div className="ic-hero-cta">
+              <button className="ic-btn ic-btn-primary ic-btn-lg">Créer un tournoi</button>
+              <button className="ic-btn ic-btn-outline ic-btn-lg ic-btn-on-band">Se connecter</button>
+            </div>
+            <ul className="ic-cta-reassure">
+              <li><IconCheck className="ic-cta-rcheck" />Sans carte bancaire</li>
+              <li><IconCheck className="ic-cta-rcheck" />Prêt en 5 minutes</li>
+              <li><IconCheck className="ic-cta-rcheck" />Annulez quand vous voulez</li>
+            </ul>
           </div>
         </div>
       </section>
@@ -333,6 +352,289 @@ function FooterCol({ title, links }: { title: string; links: string[] }) {
     <div className="ic-footer-col">
       <h5 className="ic-footer-col-title">{title}</h5>
       <ul>{links.map((l) => <li key={l}><a href="#">{l}</a></li>)}</ul>
+    </div>
+  );
+}
+
+/* --------------------------- Templates showcase --------------------------- */
+type Phase =
+  | { kind: "groups"; label: string; count: number; per: number }
+  | { kind: "league"; label: string; teams: number; note: string }
+  | { kind: "ko"; label: string; matches: number }
+  | { kind: "final"; label: string }
+  | { kind: "champion"; label: string };
+
+type TemplateDef = {
+  id: string;
+  name: string;
+  tagline: string;
+  phases: Phase[];
+};
+
+const TEMPLATES: TemplateDef[] = [
+  {
+    id: "wc",
+    name: "Coupe du Monde",
+    tagline: "Le format classique : huit poules de quatre, puis élimination directe jusqu'au sacre.",
+    phases: [
+      { kind: "groups", label: "Phase de poules", count: 8, per: 4 },
+      { kind: "ko", label: "8es de finale", matches: 8 },
+      { kind: "ko", label: "Quarts", matches: 4 },
+      { kind: "ko", label: "Demies", matches: 2 },
+      { kind: "final", label: "Finale" },
+      { kind: "champion", label: "Vainqueur" },
+    ],
+  },
+  {
+    id: "ucl",
+    name: "Ligue des Champions",
+    tagline: "Le nouveau format : une phase de ligue unique à 36, des barrages, puis le tableau final.",
+    phases: [
+      { kind: "league", label: "Phase de ligue", teams: 36, note: "8 matchs / équipe" },
+      { kind: "ko", label: "Barrages", matches: 8 },
+      { kind: "ko", label: "8es", matches: 8 },
+      { kind: "ko", label: "Quarts", matches: 4 },
+      { kind: "ko", label: "Demies", matches: 2 },
+      { kind: "final", label: "Finale" },
+      { kind: "champion", label: "Vainqueur" },
+    ],
+  },
+  {
+    id: "ko",
+    name: "Élimination directe",
+    tagline: "Le tableau pur : un seul match par tour, le perdant est éliminé. Pas de rattrapage.",
+    phases: [
+      { kind: "ko", label: "8es de finale", matches: 8 },
+      { kind: "ko", label: "Quarts", matches: 4 },
+      { kind: "ko", label: "Demies", matches: 2 },
+      { kind: "final", label: "Finale" },
+      { kind: "champion", label: "Vainqueur" },
+    ],
+  },
+  {
+    id: "league",
+    name: "Championnat",
+    tagline: "Poule unique : chaque équipe affronte toutes les autres, le classement fait le titre.",
+    phases: [
+      { kind: "league", label: "Saison régulière", teams: 12, note: "22 journées" },
+      { kind: "champion", label: "Champion" },
+    ],
+  },
+];
+
+function TemplatesShowcase() {
+  const [active, setActive] = useState(TEMPLATES[0].id);
+  const tpl = TEMPLATES.find((t) => t.id === active) ?? TEMPLATES[0];
+
+  return (
+    <section id="modeles" className="ic-section">
+      <div className="ic-section-head">
+        <span className="ic-eyebrow"><span className="ic-eyebrow-line" />Modèles prêts à l'emploi</span>
+        <h2 className="ic-h2">Partez d'une structure éprouvée.</h2>
+        <p className="ic-section-desc">
+          Choisissez un format reconnu — nous générons les poules, le tableau et le calendrier.
+          Vous ajustez ensuite tout ce que vous voulez.
+        </p>
+      </div>
+
+      <div className="ic-tpl-tabs" role="tablist" aria-label="Modèles de tournoi">
+        {TEMPLATES.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={t.id === active}
+            className={`ic-tpl-tab ${t.id === active ? "is-active" : ""}`}
+            onClick={() => setActive(t.id)}
+          >
+            {t.name}
+          </button>
+        ))}
+      </div>
+
+      <div className="ic-tpl-panel">
+        <div className="ic-tpl-panel-head">
+          <div>
+            <h3 className="ic-tpl-name">{tpl.name}</h3>
+            <p className="ic-tpl-tagline">{tpl.tagline}</p>
+          </div>
+          <button className="ic-btn ic-btn-primary">Utiliser ce modèle</button>
+        </div>
+        <div className="ic-tpl-diagram">
+          <div className="ic-tpl-flow">
+            {tpl.phases.map((p, i) => (
+              <Fragment key={i}>
+                {i > 0 && <div className="ic-tpl-conn" aria-hidden><IconChevron className="ic-tpl-chev" /></div>}
+                <PhaseColumn phase={p} />
+              </Fragment>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PhaseColumn({ phase }: { phase: Phase }) {
+  return (
+    <div className="ic-tpl-col">
+      <span className="ic-tpl-col-h">{phase.kind === "champion" ? " " : phase.label}</span>
+      <div className="ic-tpl-col-body">
+        {phase.kind === "groups" && <PhaseGroups count={phase.count} per={phase.per} />}
+        {phase.kind === "league" && <PhaseLeague teams={phase.teams} note={phase.note} />}
+        {phase.kind === "ko" && <PhaseKo matches={phase.matches} />}
+        {phase.kind === "final" && <PhaseFinal />}
+        {phase.kind === "champion" && <PhaseChampion />}
+      </div>
+    </div>
+  );
+}
+
+function PhaseGroups({ count, per }: { count: number; per: number }) {
+  return (
+    <div className="ic-tpl-groups">
+      {Array.from({ length: count }).map((_, i) => (
+        <div className="ic-tpl-group" key={i}>
+          <span className="ic-tpl-group-l">{String.fromCharCode(65 + i)}</span>
+          <div className="ic-tpl-group-dots">
+            {Array.from({ length: per }).map((_, j) => <span className="ic-tpl-dot" key={j} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PhaseLeague({ teams, note }: { teams: number; note: string }) {
+  const rows: [string, string, number][] = [
+    ["1", "RMA", 18], ["2", "BAY", 16], ["3", "LIV", 15], ["4", "FCB", 13], ["5", "ARS", 12],
+  ];
+  return (
+    <div className="ic-tpl-league">
+      {rows.map(([pos, team, pts], i) => (
+        <div className={`ic-tpl-lrow ${i === 0 ? "is-top" : ""}`} key={team}>
+          <span className="ic-tpl-lpos">{pos}</span>
+          <span className="ic-tpl-lteam"><span className="ic-tpl-dot" />{team}</span>
+          <span className="ic-tpl-lpts">{pts}</span>
+        </div>
+      ))}
+      <span className="ic-tpl-lnote">+{teams - 5} équipes · {note}</span>
+    </div>
+  );
+}
+
+function PhaseKo({ matches }: { matches: number }) {
+  return (
+    <div className="ic-tpl-ko">
+      {Array.from({ length: matches }).map((_, i) => (
+        <div className="ic-tpl-node" key={i}>
+          <span className="ic-tpl-slot" />
+          <span className="ic-tpl-slot" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PhaseFinal() {
+  return (
+    <div className="ic-tpl-finalwrap">
+      <div className="ic-tpl-node is-final">
+        <span className="ic-tpl-fteam is-win"><span className="ic-tpl-dot is-gold" />RMA</span>
+        <span className="ic-tpl-fteam"><span className="ic-tpl-dot" />FCB</span>
+      </div>
+    </div>
+  );
+}
+
+function PhaseChampion() {
+  return (
+    <div className="ic-tpl-champ">
+      <IconTrophy className="ic-tpl-champ-ic" />
+      <strong>Vainqueur</strong>
+      <span>RMA</span>
+    </div>
+  );
+}
+
+/* --------------------------- Public page showcase ------------------------- */
+function PublicShowcase() {
+  return (
+    <section id="public" className="ic-section">
+      <div className="ic-pub">
+        <div className="ic-pub-text">
+          <span className="ic-eyebrow"><span className="ic-eyebrow-line" />Page publique</span>
+          <h2 className="ic-h2">Une vitrine publique pour les parents, les supporters et les curieux.</h2>
+          <p className="ic-section-desc ic-pub-desc">
+            Partagez un seul lien : tout le monde suit le tournoi en direct — résultats, classements,
+            calendrier et le détail de chaque rencontre. Aucune application à installer.
+          </p>
+          <ul className="ic-pub-feats">
+            <li><IconCheck className="ic-check" />Suivi en direct, score après score</li>
+            <li><IconCheck className="ic-check" />Un simple lien à partager — aucune appli</li>
+            <li><IconCheck className="ic-check" />Résultats, classements et calendrier par jour</li>
+            <li><IconCheck className="ic-check" />Le détail de chaque match, but par but</li>
+          </ul>
+          <a className="ic-btn ic-btn-primary ic-btn-lg ic-pub-cta" href="/t/hammamet-beach-2026" target="_blank" rel="noreferrer">
+            Voir une vitrine en direct <IconArrow />
+          </a>
+        </div>
+        <div className="ic-pub-visual">
+          <span className="ic-pub-url" aria-hidden><IconGlobe className="ic-pub-url-ic" />ismart.cup/hammamet-2026</span>
+          <PublicPhone />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PublicPhone() {
+  const rows: [string, string, string, boolean][] = [
+    ["1", "Hammamet", "7", true],
+    ["2", "Nabeul", "4", false],
+    ["3", "Djerba", "3", false],
+  ];
+  return (
+    <div className="ic-phone" aria-hidden>
+      <span className="ic-phone-cam" />
+      <div className="ic-phone-screen">
+        <div className="ic-pm-bar">
+          <span className="ic-pm-logo"><IconTrophy className="ic-pm-logo-ic" />iSmart<span>·Cup</span></span>
+          <span className="ic-pm-live"><span className="ic-pm-live-dot" />En cours</span>
+        </div>
+
+        <div className="ic-pm-hero">
+          <span className="ic-pm-hero-badge">Beach Soccer · U17</span>
+          <strong className="ic-pm-hero-title">iSmart Beach Cup</strong>
+          <span className="ic-pm-hero-meta"><IconCalendar className="ic-pm-mini-ic" />Hammamet · 1–7 juil.</span>
+        </div>
+
+        <div className="ic-pm-tabs">
+          <span className="is-active">Accueil</span><span>Résultats</span><span>Matchs</span><span>Classement</span>
+        </div>
+
+        <div className="ic-pm-body">
+          <div className="ic-pm-next">
+            <div className="ic-pm-next-h"><IconClock className="ic-pm-mini-ic" />Prochain match</div>
+            <div className="ic-pm-next-row">
+              <span className="ic-pm-team"><Avatar label="Ha" /><b>Hammamet</b></span>
+              <span className="ic-pm-vs"><strong>16:00</strong><small>VS</small></span>
+              <span className="ic-pm-team"><Avatar label="Sf" tone="slate" /><b>Sfax</b></span>
+            </div>
+          </div>
+
+          <div className="ic-pm-stand">
+            <div className="ic-pm-stand-h"><IconChart className="ic-pm-mini-ic" />Classement · Poule A</div>
+            {rows.map(([pos, team, pts, lead]) => (
+              <div className={`ic-pm-srow ${lead ? "is-lead" : ""}`} key={team}>
+                <span className="ic-pm-spos">{pos}</span>
+                <span className="ic-pm-steam"><Avatar label={team.slice(0, 2)} tone={lead ? "gold" : "blue"} />{team}</span>
+                <span className="ic-pm-spts">{pts}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -436,6 +738,125 @@ function MockCalendar() {
   );
 }
 
+// Live match déroulé — mirrors the public match-detail timeline (center axis,
+// minute pill, goals on alternating sides), but in-progress with a pulsing badge.
+function MockTimeline() {
+  const events = [
+    { side: 1, minute: 12, who: "Mbappé", team: "PSG" },
+    { side: 2, minute: 34, who: "Lewandowski", team: "FCB" },
+    { side: 1, minute: 58, who: "Dembélé", team: "PSG" },
+  ];
+  return (
+    <div className="ic-mock ic-mock-timeline">
+      <div className="ic-tl-head">
+        <span className="ic-live"><span className="ic-live-dot" />En direct</span>
+        <span className="ic-tl-clock">67'</span>
+      </div>
+      <div className="ic-tl-score">
+        <span><Avatar label="PS" />PSG</span>
+        <strong>2 — 1</strong>
+        <span>FCB<Avatar label="FC" tone="slate" /></span>
+      </div>
+      <div className="ic-tl">
+        <span className="ic-tl-axis" aria-hidden />
+        {events.map((e, i) => (
+          <div className="ic-tl-row" key={i}>
+            <div className="ic-tl-cell">{e.side === 1 && <TlEvent who={e.who} team={e.team} />}</div>
+            <div className="ic-tl-cell ic-r">{e.side === 2 && <TlEvent who={e.who} team={e.team} />}</div>
+            <span className="ic-tl-min">{e.minute}'</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TlEvent({ who, team }: { who: string; team: string }) {
+  return (
+    <span className="ic-tl-ev">
+      <IconBall className="ic-tl-ball" />
+      <span><strong>{who}</strong><small>{team}</small></span>
+    </span>
+  );
+}
+
+// Top scorers — leaderboard, leader highlighted in gold (gold = trophies/rewards).
+function MockScorers() {
+  const rows = [
+    ["1", "Mbappé", "PSG", "5", "gold"],
+    ["2", "Haaland", "MCI", "4", "blue"],
+    ["3", "Osimhen", "INT", "3", "slate"],
+  ] as [string, string, string, string, string][];
+  return (
+    <div className="ic-mock ic-mock-scorers">
+      <div className="ic-mock-head"><IconBall className="ic-mock-headicon" /> Meilleurs buteurs</div>
+      <div className="ic-sc">
+        {rows.map(([pos, name, team, goals, tone]) => (
+          <div className="ic-sc-r" key={name}>
+            <span className="ic-sc-pos">{pos}</span>
+            <Avatar label={name.slice(0, 2)} tone={tone} />
+            <span className="ic-sc-name"><strong>{name}</strong><small>{team}</small></span>
+            <span className="ic-sc-goals">{goals}<IconBall className="ic-sc-ball" /></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Knockout bracket — mirrors the public "Phase finale": two semis on the left,
+// the final on the right with the champion crowned in gold.
+type Tie = [abbr: string, name: string, score: number, win: boolean];
+function MockBracket() {
+  return (
+    <div className="ic-mock ic-mock-bracket-tree">
+      <div className="ic-mock-head"><IconTrophy className="ic-mock-headicon" /> Phase finale</div>
+      <div className="ic-br">
+        <div className="ic-br-col">
+          <span className="ic-br-round">Quarts</span>
+          <BrTie a={["RMA", "RMA", 3, true]} b={["JUV", "JUV", 1, false]} />
+          <BrTie a={["BAY", "BAY", 2, true]} b={["ATM", "ATM", 0, false]} />
+          <BrTie a={["FCB", "FCB", 2, true]} b={["PSG", "PSG", 1, false]} />
+          <BrTie a={["MCI", "MCI", 2, true]} b={["INT", "INT", 1, false]} />
+        </div>
+        <div className="ic-br-conn" aria-hidden><span /><span /></div>
+        <div className="ic-br-col ic-br-demis">
+          <span className="ic-br-round">Demies</span>
+          <BrTie a={["RMA", "RMA", 2, true]} b={["BAY", "BAY", 1, false]} />
+          <BrTie a={["FCB", "FCB", 3, true]} b={["MCI", "MCI", 2, false]} />
+        </div>
+        <div className="ic-br-conn" aria-hidden><span /><span /></div>
+        <div className="ic-br-col ic-br-final">
+          <span className="ic-br-round">Finale</span>
+          <BrTie a={["RMA", "RMA", 2, true]} b={["FCB", "FCB", 1, false]} gold />
+          <span className="ic-br-champ"><IconTrophy className="ic-br-champ-ic" />Champion · RMA</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BrTie({ a, b, gold }: { a: Tie; b: Tie; gold?: boolean }) {
+  return (
+    <div className={`ic-br-tie ${gold ? "is-gold" : ""}`}>
+      <BrSide t={a} gold={gold} />
+      <span className="ic-br-div" />
+      <BrSide t={b} gold={gold} />
+    </div>
+  );
+}
+
+function BrSide({ t, gold }: { t: Tie; gold?: boolean }) {
+  const [abbr, name, score, win] = t;
+  return (
+    <div className={`ic-br-side ${win ? "is-win" : ""}`}>
+      <Avatar label={abbr.slice(0, 2)} tone={win && gold ? "gold" : "blue"} />
+      <span className="ic-br-name">{name}</span>
+      <span className="ic-br-score">{score}</span>
+    </div>
+  );
+}
+
 function Bar({ label, val, pct }: { label: string; val: string; pct: number }) {
   return (
     <div className="ic-bar">
@@ -469,11 +890,20 @@ function IconMegaphone({ className = "" }) {
 function IconGlobe({ className = "" }) {
   return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" /></svg>);
 }
+function IconBall({ className = "" }) {
+  return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="m12 7 3.3 2.4-1.26 3.9H9.96L8.7 9.4 12 7Z" /><path d="M12 7V3.2M15.3 9.4 18.9 8.1M14.04 13.3l2.3 3M9.96 13.3l-2.3 3M8.7 9.4 5.1 8.1" /></svg>);
+}
 function IconCheck({ className = "" }) {
   return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>);
 }
 function IconArrow({ className = "" }) {
   return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>);
+}
+function IconChevron({ className = "" }) {
+  return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>);
+}
+function IconClock({ className = "" }) {
+  return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></svg>);
 }
 function IconInstagram() {
   return (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" /></svg>);
@@ -557,7 +987,6 @@ function Styles() {
 .ic-hero-inner{position:relative;max-width:780px}
 .ic-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--brand-50);color:var(--brand-700);
   border:1px solid var(--brand-100);border-radius:100px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;margin-bottom:1.6rem}
-.ic-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(16,185,129,.18)}
 .ic-h1{font-size:clamp(2.4rem,6vw,4rem);line-height:1.05;font-weight:800;letter-spacing:-.03em}
 .ic-h1-accent{color:var(--brand-600)}
 .ic-lead{margin:1.4rem auto 0;max-width:600px;color:var(--ink-muted);font-size:clamp(1rem,1.6vw,1.15rem);line-height:1.7}
@@ -573,15 +1002,17 @@ function Styles() {
 .ic-trust{margin-top:2rem;color:var(--ink-muted);font-size:.85rem}
 .ic-trust-num{color:var(--ink);font-weight:700}
 
-/* hero floating preview */
-.ic-hero-preview{position:relative;width:100%;max-width:1000px;height:300px;margin-top:1rem}
+/* hero floating preview — a fanned cascade; cards overlap left→right (horizontal
+   overlap) and stagger vertically, climbing in z toward the full bracket. */
+.ic-hero-preview{position:relative;width:100%;max-width:1120px;height:370px;margin-top:1.25rem}
 .ic-float{position:absolute;animation:icfloat 6s ease-in-out infinite}
-.ic-float-1{left:6%;top:30px;animation-delay:0s}
-.ic-float-2{left:50%;transform:translateX(-50%);top:0;animation-delay:.8s;z-index:2}
-.ic-float-3{right:6%;top:60px;animation-delay:1.6s}
+.ic-float-1{left:0;top:55px;z-index:1;animation-delay:0s;animation-duration:6.4s}      /* Classement */
+.ic-float-4{left:13%;top:115px;z-index:2;animation-delay:1.9s;animation-duration:7.2s} /* Timeline live */
+.ic-float-2{left:27%;top:35px;z-index:3;animation-delay:.6s;animation-duration:6.2s}   /* Match */
+.ic-float-5{left:41%;top:120px;z-index:4;animation-delay:2.5s;animation-duration:6.6s} /* Buteurs */
+.ic-float-3{left:54%;top:48px;z-index:5;animation-delay:1.2s;animation-duration:6.8s}  /* Nœud demi */
+.ic-float-6{left:64%;top:96px;z-index:6;animation-delay:1.5s;animation-duration:7.6s}  /* Bracket complet */
 @keyframes icfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.ic-float-2{animation-name:icfloat2}
-@keyframes icfloat2{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-12px)}}
 
 /* sections */
 .ic-section{padding:clamp(4rem,8vw,7rem) clamp(1rem,5vw,3rem);max-width:1180px;margin:0 auto}
@@ -644,16 +1075,129 @@ function Styles() {
 
 /* cta band */
 .ic-cta{padding:clamp(3rem,6vw,5rem) clamp(1rem,5vw,3rem)}
-.ic-cta-inner{max-width:760px;margin:0 auto;text-align:center;background:linear-gradient(135deg,var(--brand-700),var(--brand-600));
-  border-radius:var(--r-2xl);padding:clamp(2.5rem,5vw,3.5rem);color:#fff;box-shadow:var(--sh-lg);position:relative;overflow:hidden}
-.ic-cta-trophy{width:2.4rem;height:2.4rem;color:var(--gold-500);margin-bottom:1rem}
-.ic-cta-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800}
-.ic-cta-sub{margin:.8rem auto 0;max-width:460px;color:rgba(255,255,255,.85);line-height:1.6}
-.ic-cta .ic-hero-cta{margin-top:1.8rem}
+.ic-cta-inner{position:relative;overflow:hidden;max-width:920px;margin:0 auto;text-align:center;
+  background:linear-gradient(135deg,var(--brand-700),var(--brand-600) 55%,var(--brand-500));
+  border-radius:var(--r-2xl);padding:clamp(2.75rem,6vw,4rem) clamp(1.5rem,5vw,3.5rem);color:#fff;box-shadow:var(--sh-lg)}
+.ic-cta-bg{position:absolute;inset:0;pointer-events:none}
+.ic-cta-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);
+  background-size:42px 42px;mask-image:radial-gradient(ellipse 85% 75% at 50% 0%,#000,transparent 72%);-webkit-mask-image:radial-gradient(ellipse 85% 75% at 50% 0%,#000,transparent 72%)}
+.ic-cta-glow{position:absolute;left:50%;top:-35%;transform:translateX(-50%);width:560px;height:360px;background:radial-gradient(ellipse at center,rgba(255,255,255,.22),transparent 65%)}
+.ic-cta-content{position:relative;z-index:1}
+.ic-cta-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  color:#fff;font-size:.76rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.4rem .9rem;border-radius:100px;margin-bottom:1.3rem}
+.ic-cta-title{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:800;letter-spacing:-.025em}
+.ic-cta-sub{margin:.9rem auto 0;max-width:480px;color:rgba(255,255,255,.88);line-height:1.6;font-size:1.02rem}
+.ic-cta .ic-hero-cta{margin-top:1.9rem}
 .ic-cta .ic-btn-primary{background:#fff;color:var(--brand-700)}
 .ic-cta .ic-btn-primary:hover{background:var(--gold-50)}
+.ic-cta-reassure{display:flex;flex-wrap:wrap;gap:1rem 1.6rem;justify-content:center;margin-top:1.9rem;
+  color:rgba(255,255,255,.9);font-size:.85rem;font-weight:500}
+.ic-cta-reassure li{display:inline-flex;align-items:center;gap:.45rem}
+.ic-cta-rcheck{width:1rem;height:1rem;color:var(--gold-500)}
 .ic-btn-on-band{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
 .ic-btn-on-band:hover{background:rgba(255,255,255,.12);border-color:#fff;color:#fff}
+
+/* templates showcase */
+.ic-tpl-tabs{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.4rem}
+.ic-tpl-tab{font-family:inherit;font-weight:600;font-size:.9rem;color:var(--ink-subtle);background:var(--surface);
+  border:1px solid var(--border);border-radius:100px;padding:.55rem 1.15rem;cursor:pointer;transition:.18s ease;white-space:nowrap}
+.ic-tpl-tab:hover{border-color:var(--brand-200);color:var(--brand-700);background:var(--brand-50)}
+.ic-tpl-tab.is-active{background:var(--brand-600);border-color:var(--brand-600);color:#fff;box-shadow:var(--sh-sm)}
+.ic-tpl-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);box-shadow:var(--sh-md);padding:clamp(1.25rem,3vw,2rem)}
+.ic-tpl-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.ic-tpl-name{font-size:clamp(1.2rem,2.4vw,1.55rem);font-weight:800;letter-spacing:-.02em}
+.ic-tpl-tagline{margin-top:.4rem;max-width:540px;color:var(--ink-muted);font-size:.95rem;line-height:1.6}
+.ic-tpl-diagram{margin-top:1.4rem;padding:1.4rem .25rem .5rem;border-top:1px solid var(--border);overflow-x:auto}
+.ic-tpl-flow{display:flex;align-items:stretch;gap:.4rem;min-width:max-content;padding:0 .25rem}
+.ic-tpl-col{display:flex;flex-direction:column;gap:.6rem;min-width:98px}
+.ic-tpl-col-h{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-muted);text-align:center;white-space:nowrap}
+.ic-tpl-col-body{flex:1;display:flex;flex-direction:column}
+.ic-tpl-conn{display:flex;align-items:center;justify-content:center;color:var(--border-strong)}
+.ic-tpl-chev{width:1.05rem;height:1.05rem}
+.ic-tpl-ko{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:.4rem}
+.ic-tpl-node{display:flex;flex-direction:column;gap:4px;padding:6px 7px;border:1px solid var(--border);border-radius:8px;background:var(--surface);box-shadow:var(--sh-sm)}
+.ic-tpl-slot{display:flex;align-items:center;gap:5px;min-width:48px}
+.ic-tpl-slot::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--brand-200);flex:none}
+.ic-tpl-slot::after{content:"";flex:1;height:6px;border-radius:3px;background:var(--surface-muted)}
+.ic-tpl-groups{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:.4rem;align-content:center}
+.ic-tpl-group{display:flex;align-items:center;gap:5px;padding:5px 6px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.ic-tpl-group-l{display:grid;place-items:center;width:16px;height:16px;border-radius:5px;background:var(--brand-50);color:var(--brand-700);font-size:.56rem;font-weight:800;flex:none}
+.ic-tpl-group-dots{display:flex;gap:3px}
+.ic-tpl-dot{width:8px;height:8px;border-radius:50%;background:var(--brand-200);flex:none}
+.ic-tpl-dot.is-gold{background:var(--gold-500)}
+.ic-tpl-league{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:124px}
+.ic-tpl-lrow{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;font-size:.64rem}
+.ic-tpl-lrow.is-top{background:var(--brand-50)}
+.ic-tpl-lpos{font-weight:800;color:var(--ink-muted);text-align:center}
+.ic-tpl-lteam{display:flex;align-items:center;gap:5px;font-weight:600;color:var(--ink-subtle)}
+.ic-tpl-lrow.is-top .ic-tpl-lteam{color:var(--ink)}
+.ic-tpl-lpts{font-weight:700;font-variant-numeric:tabular-nums}
+.ic-tpl-lnote{margin-top:5px;font-size:.58rem;color:var(--ink-muted);text-align:center;line-height:1.4}
+.ic-tpl-finalwrap{flex:1;display:flex;flex-direction:column;justify-content:center}
+.ic-tpl-node.is-final{border-color:var(--brand-200);box-shadow:var(--sh-md)}
+.ic-tpl-fteam{display:flex;align-items:center;gap:6px;font-size:.66rem;font-weight:600;color:var(--ink-muted)}
+.ic-tpl-fteam.is-win{color:var(--ink);font-weight:800}
+.ic-tpl-champ{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:12px 14px;border:1px solid var(--gold-100);border-radius:12px;background:var(--gold-50);text-align:center;min-width:104px}
+.ic-tpl-champ-ic{width:1.5rem;height:1.5rem;color:var(--gold-500)}
+.ic-tpl-champ strong{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold-600)}
+.ic-tpl-champ span{font-size:.85rem;font-weight:800;color:var(--ink)}
+
+/* public page showcase */
+.ic-pub{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+.ic-pub-text .ic-eyebrow{margin-bottom:.9rem}
+.ic-pub-desc{margin-top:1rem;max-width:520px}
+.ic-pub-feats{margin-top:1.6rem;display:flex;flex-direction:column;gap:.75rem}
+.ic-pub-feats li{display:flex;align-items:center;gap:.6rem;color:var(--ink-subtle);font-size:.97rem;font-weight:500}
+.ic-pub-cta{margin-top:1.9rem}
+.ic-root a.ic-pub-cta{color:#fff}
+.ic-pub-visual{position:relative;display:flex;justify-content:center;align-items:center}
+.ic-pub-visual::before{content:"";position:absolute;width:78%;height:74%;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(59,130,246,.18),rgba(245,158,11,.06) 55%,transparent 72%);filter:blur(12px);z-index:0}
+.ic-pub-url{position:absolute;top:3%;left:0;z-index:3;display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:.5rem .9rem;
+  font-size:.8rem;font-weight:600;color:var(--ink-subtle);box-shadow:var(--sh-md);animation:icfloat 6s ease-in-out infinite}
+.ic-pub-url-ic{width:1rem;height:1rem;color:var(--brand-600)}
+/* phone */
+.ic-phone{position:relative;z-index:1;width:300px;max-width:100%;background:#0f172a;border-radius:2.3rem;padding:1rem .5rem .55rem;box-shadow:var(--sh-lg)}
+.ic-phone-cam{position:absolute;top:.45rem;left:50%;transform:translateX(-50%);width:32%;height:5px;border-radius:100px;background:#334155}
+.ic-phone-screen{position:relative;background:var(--surface-subtle);border-radius:1.75rem;overflow:hidden}
+.ic-pm-bar{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;background:var(--surface);border-bottom:1px solid var(--border)}
+.ic-pm-logo{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:800;color:var(--ink)}
+.ic-pm-logo span{color:var(--brand-600)}
+.ic-pm-logo-ic{width:.95rem;height:.95rem;color:var(--brand-600)}
+.ic-pm-live{display:inline-flex;align-items:center;gap:.35rem;font-size:.64rem;font-weight:700;color:#047857;background:rgba(16,185,129,.12);padding:.2rem .5rem;border-radius:100px}
+.ic-pm-live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:icpulseg 1.6s ease-out infinite}
+@keyframes icpulseg{0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}70%{box-shadow:0 0 0 6px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.ic-pm-hero{background:linear-gradient(135deg,var(--brand-700),var(--brand-600));color:#fff;padding:.85rem .85rem 1rem}
+.ic-pm-hero-badge{display:inline-block;font-size:.58rem;font-weight:700;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);padding:.2rem .55rem;border-radius:100px}
+.ic-pm-hero-title{display:block;margin-top:.5rem;font-size:1.05rem;font-weight:800;letter-spacing:-.02em}
+.ic-pm-hero-meta{display:inline-flex;align-items:center;gap:.3rem;margin-top:.4rem;font-size:.66rem;color:rgba(255,255,255,.85)}
+.ic-pm-mini-ic{width:.8rem;height:.8rem;flex:none}
+.ic-pm-tabs{display:flex;gap:.25rem;padding:.5rem .55rem;background:var(--surface);border-bottom:1px solid var(--border)}
+.ic-pm-tabs span{flex:1;text-align:center;font-size:.58rem;font-weight:600;color:var(--ink-muted);padding:.35rem .15rem;border-radius:100px;white-space:nowrap}
+.ic-pm-tabs .is-active{background:var(--brand-50);color:var(--brand-600)}
+.ic-pm-body{padding:.7rem;display:flex;flex-direction:column;gap:.7rem}
+.ic-pm-next{border:1px solid var(--brand-200);background:linear-gradient(to bottom,rgba(239,246,255,.7),var(--surface));border-radius:.85rem;padding:.7rem}
+.ic-pm-next-h{display:flex;align-items:center;gap:.3rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--brand-700);margin-bottom:.6rem}
+.ic-pm-next-row{display:flex;align-items:center;justify-content:space-between;gap:.4rem}
+.ic-pm-team{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex:1;min-width:0}
+.ic-pm-team b{font-size:.66rem;font-weight:700;color:var(--ink);text-align:center}
+.ic-pm-team .ic-av{width:1.8rem;height:1.8rem;font-size:.62rem}
+.ic-pm-vs{display:flex;flex-direction:column;align-items:center;flex:none}
+.ic-pm-vs strong{font-size:.95rem;font-weight:800;color:var(--brand-700);font-variant-numeric:tabular-nums}
+.ic-pm-vs small{font-size:.5rem;color:var(--ink-muted);letter-spacing:.05em}
+.ic-pm-stand{border:1px solid var(--border);border-radius:.85rem;background:var(--surface);overflow:hidden}
+.ic-pm-stand-h{display:flex;align-items:center;gap:.3rem;font-size:.6rem;font-weight:700;color:var(--ink-subtle);padding:.5rem .65rem;border-bottom:1px solid var(--border)}
+.ic-pm-srow{display:grid;grid-template-columns:1rem 1fr auto;align-items:center;gap:.45rem;padding:.42rem .65rem;font-size:.66rem}
+.ic-pm-srow+.ic-pm-srow{border-top:1px solid var(--border)}
+.ic-pm-srow.is-lead{background:var(--brand-50)}
+.ic-pm-spos{font-weight:800;color:var(--ink-muted);text-align:center}
+.ic-pm-steam{display:flex;align-items:center;gap:.4rem;font-weight:600;color:var(--ink-subtle);min-width:0}
+.ic-pm-srow.is-lead .ic-pm-steam{color:var(--ink)}
+.ic-pm-steam .ic-av{width:1.15rem;height:1.15rem;font-size:.46rem}
+.ic-pm-spts{font-weight:800;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.ic-pub{grid-template-columns:1fr;gap:2.5rem}}
 
 /* footer */
 .ic-footer{background:var(--ink);color:#cbd5e1}
@@ -686,6 +1230,7 @@ function Styles() {
 .ic-mc-head small{color:var(--ink-muted);font-size:.78rem}
 .ic-av{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;font-size:.62rem;font-weight:700;color:#fff;flex-shrink:0}
 .ic-av-blue{background:var(--brand-500)}.ic-av-slate{background:var(--ink-subtle)}.ic-av-gold{background:var(--gold-500)}
+.ic-mock-table{width:248px}
 .ic-tbl{display:flex;flex-direction:column}
 .ic-tbl-h,.ic-tbl-r{display:grid;grid-template-columns:1.4rem 1fr 1.8rem 1.8rem;align-items:center;gap:.5rem;padding:.4rem .5rem}
 .ic-tbl-h{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);background:var(--surface-muted);border-radius:var(--r-md)}
@@ -722,6 +1267,62 @@ function Styles() {
 .ic-cal-h{font-size:.7rem;font-weight:700;text-align:center;color:var(--ink-subtle)}
 .ic-cal-slot{font-size:.72rem;font-weight:600;text-align:center;padding:.5rem .3rem;border-radius:var(--r-md);background:var(--brand-50);color:var(--brand-700)}
 .ic-cal-slot.is-empty{background:transparent;border:1.5px dashed var(--border-strong);color:var(--ink-muted);font-weight:500}
+
+/* live timeline mock */
+.ic-mock-timeline{width:240px}
+.ic-tl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.55rem}
+.ic-live{display:inline-flex;align-items:center;gap:.4rem;font-size:.66rem;font-weight:800;letter-spacing:.05em;color:#ef4444;text-transform:uppercase}
+.ic-live-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;animation:icpulse 1.6s ease-out infinite}
+@keyframes icpulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.ic-tl-clock{font-size:.72rem;font-weight:700;color:var(--ink-subtle);font-variant-numeric:tabular-nums}
+.ic-tl-score{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:.1rem 0 .7rem;margin-bottom:.6rem;border-bottom:1px solid var(--border);font-size:.74rem;font-weight:600}
+.ic-tl-score>span{display:inline-flex;align-items:center;gap:.3rem}
+.ic-tl-score strong{font-size:1.05rem;font-weight:800;letter-spacing:-.02em}
+.ic-tl{position:relative}
+.ic-tl-axis{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);transform:translateX(-50%)}
+.ic-tl-row{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0 1.4rem;padding:.32rem 0}
+.ic-tl-cell{min-width:0;display:flex;justify-content:flex-end}
+.ic-tl-cell.ic-r{justify-content:flex-start}
+.ic-tl-ev{display:inline-flex;align-items:center;gap:.35rem;min-width:0}
+.ic-tl-cell.ic-r .ic-tl-ev{flex-direction:row-reverse}
+.ic-tl-ev>span{display:flex;flex-direction:column;line-height:1.12;min-width:0}
+.ic-tl-cell.ic-r .ic-tl-ev>span{text-align:right}
+.ic-tl-ev strong{font-size:.72rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ic-tl-ev small{font-size:.6rem;color:var(--ink-muted)}
+.ic-tl-ball{width:.85rem;height:.85rem;color:var(--ink-subtle);flex-shrink:0}
+.ic-tl-min{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:1.55rem;height:1.55rem;border-radius:50%;border:1px solid var(--border);background:var(--surface);font-size:.6rem;font-weight:700;color:var(--ink-subtle);font-variant-numeric:tabular-nums;z-index:1}
+
+/* top scorers mock */
+.ic-mock-scorers{width:218px}
+.ic-sc{display:flex;flex-direction:column;gap:.15rem}
+.ic-sc-r{display:grid;grid-template-columns:.9rem 1.5rem 1fr auto;align-items:center;gap:.5rem;padding:.33rem .3rem;border-radius:var(--r-md)}
+.ic-sc-r:first-child{background:var(--gold-50)}
+.ic-sc-pos{font-size:.72rem;font-weight:800;color:var(--ink-muted);text-align:center}
+.ic-sc-name{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.ic-sc-name strong{font-size:.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ic-sc-name small{font-size:.6rem;color:var(--ink-muted)}
+.ic-sc-goals{display:inline-flex;align-items:center;gap:.25rem;font-size:.82rem;font-weight:800;color:var(--gold-600)}
+.ic-sc-ball{width:.8rem;height:.8rem}
+
+/* knockout bracket mock — Quarts → Demies → Finale */
+.ic-mock-bracket-tree{width:362px;padding:.85rem}
+.ic-br{display:grid;grid-template-columns:1fr 14px 1fr 14px 1fr;align-items:center;margin-top:.2rem}
+.ic-br-col{display:flex;flex-direction:column;gap:.4rem}
+.ic-br-round{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-muted);text-align:center}
+.ic-br-tie{display:flex;flex-direction:column;gap:.18rem;padding:.26rem .3rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface)}
+.ic-br-tie.is-gold{border-color:var(--gold-100);box-shadow:0 0 0 1px var(--gold-100)}
+.ic-br-div{height:1px;background:var(--border)}
+.ic-br-side{display:grid;grid-template-columns:.95rem 1fr auto;align-items:center;gap:.3rem;font-size:.62rem;line-height:1.1;color:var(--ink-subtle)}
+.ic-br-side .ic-av{width:.95rem;height:.95rem;font-size:.42rem}
+.ic-br-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ic-br-side.is-win{color:var(--ink);font-weight:700}
+.ic-br-score{font-weight:700;font-variant-numeric:tabular-nums}
+.ic-br-conn{position:relative;align-self:stretch}
+.ic-br-conn span{position:absolute;left:1px;right:1px;height:1px;background:var(--border)}
+.ic-br-conn span:nth-child(1){top:34%}
+.ic-br-conn span:nth-child(2){top:66%}
+.ic-br-champ{display:inline-flex;align-items:center;justify-content:center;gap:.3rem;margin-top:.4rem;padding:.28rem;border-radius:var(--r-md);background:var(--gold-50);color:var(--gold-600);font-size:.6rem;font-weight:700}
+.ic-br-champ-ic{width:.8rem;height:.8rem}
 
 .ic-hide-sm{}
 /* responsive */
